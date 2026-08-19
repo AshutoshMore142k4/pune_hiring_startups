@@ -1,0 +1,38 @@
+---
+import ContentShell from '../layouts/ContentShell.astro'
+import JobRows from '../components/JobRows.astro'
+import { allJobs } from '../data/load'
+import { collectionLd } from '../data/seo'
+import { jobSlug, url } from '../data/slugs'
+
+const jobs = (await allJobs()).filter((j) => j.experience_max !== null && j.experience_max <= 2)
+const companies = [...new Set(jobs.map((j) => j.company.name))]
+
+const h1 = 'Fresher jobs at Pune startups'
+const description =
+  `${jobs.length} open roles at Pune startups asking for two years of experience or less — ` +
+  `the realistic list for final-year students and recent graduates. Refreshed every six hours.`
+---
+
+<ContentShell
+  title={`${h1} — 0–2 years experience | Startup Radar`}
+  description={description}
+  path="/fresher-jobs-in-pune/"
+  h1={h1}
+  lede={description}
+  crumbs={[{ name: 'Roles', href: '/roles/' }, { name: 'Fresher jobs', href: '/fresher-jobs-in-pune/' }]}
+  jsonLd={[collectionLd(h1, description, jobs.map((j) => ({ name: j.title, href: url.job(jobSlug(j.company.slug, j.title, j.ats_job_id)) })), Astro.site)]}
+>
+  <JobRows jobs={jobs} />
+
+  <h2 style="margin-top:2.2em">How this list is built</h2>
+  <p class="muted">
+    Experience is read from the role title and description — phrases like "0–2 years",
+    "fresher", "graduate", "associate" or "SDE I". It is a heuristic, not a promise, so read
+    the actual posting before you apply. Roles that name no experience level are left out
+    rather than guessed at.
+  </p>
+  {companies.length > 0 && (
+    <p class="small muted">Currently hiring at this level: {companies.join(', ')}.</p>
+  )}
+</ContentShell>

@@ -1,0 +1,39 @@
+---
+import ContentShell from '../../layouts/ContentShell.astro'
+import { loadAll, stats } from '../../data/load'
+import { collectionLd } from '../../data/seo'
+import { url } from '../../data/slugs'
+
+const companies = (await loadAll()).sort(
+  (a, b) => b.jobs.length - a.jobs.length || a.name.localeCompare(b.name),
+)
+const s = await stats()
+
+const h1 = `Pune startups (${s.companies} tracked)`
+const description =
+  `Every Pune startup and scale-up we track, ${s.hiring} of them hiring right now across ` +
+  `${s.jobs} open roles. Sorted by how much they are hiring.`
+---
+
+<ContentShell
+  title={`${h1} — who is hiring | Startup Radar`}
+  description={description}
+  path={url.companies()}
+  h1={h1}
+  lede={description}
+  crumbs={[{ name: 'Startups', href: url.companies() }]}
+  jsonLd={[collectionLd(h1, description, companies.map((c) => ({ name: c.name, href: url.company(c.slug) })), Astro.site)]}
+>
+  <div class="grid">
+    {companies.map((c) => (
+      <a class="tile" href={url.company(c.slug)}>
+        <h3>{c.name}</h3>
+        <span class="meta">{[c.area, c.industry].filter(Boolean).join(' · ')}</span>
+        <span class:list={['badge', c.jobs.length === 0 && 'is-idle']}>
+          <span class:list={['dot', c.jobs.length === 0 && 'is-idle']}></span>
+          {c.jobs.length ? `${c.jobs.length} open ${c.jobs.length === 1 ? 'role' : 'roles'}` : 'careers page only'}
+        </span>
+      </a>
+    ))}
+  </div>
+</ContentShell>

@@ -1,0 +1,27 @@
+---
+import ContentShell from '../../layouts/ContentShell.astro'
+import JobRows from '../../components/JobRows.astro'
+import { allJobs, stats } from '../../data/load'
+import { collectionLd } from '../../data/seo'
+import { jobSlug, url } from '../../data/slugs'
+
+const jobs = await allJobs()
+const s = await stats()
+
+const h1 = `Latest startup jobs in Pune`
+const description =
+  `All ${s.jobs} open roles at Pune startups, newest first. Pulled straight from each ` +
+  `company's own job feed and refreshed every six hours.`
+---
+
+<ContentShell
+  title={`${h1} — ${s.jobs} open roles | Startup Radar`}
+  description={description}
+  path={url.jobs()}
+  h1={h1}
+  lede={description}
+  crumbs={[{ name: 'Jobs', href: url.jobs() }]}
+  jsonLd={[collectionLd(h1, description, jobs.map((j) => ({ name: j.title, href: url.job(jobSlug(j.company.slug, j.title, j.ats_job_id)) })), Astro.site)]}
+>
+  <JobRows jobs={jobs} />
+</ContentShell>

@@ -1,0 +1,34 @@
+---
+import ContentShell from '../layouts/ContentShell.astro'
+import JobRows from '../components/JobRows.astro'
+import { allJobs } from '../data/load'
+import { collectionLd } from '../data/seo'
+import { jobSlug, url } from '../data/slugs'
+
+const jobs = (await allJobs()).filter(
+  (j) => j.employment_type === 'internship' || j.experience_max === 0,
+)
+
+const h1 = 'Internships at Pune startups'
+const description =
+  `${jobs.length} open internships at Pune startups, taken straight from company job feeds ` +
+  `and refreshed every six hours.`
+---
+
+<ContentShell
+  title={`${h1} — currently open | Startup Radar`}
+  description={description}
+  path="/internships-in-pune/"
+  h1={h1}
+  lede={description}
+  crumbs={[{ name: 'Roles', href: '/roles/' }, { name: 'Internships', href: '/internships-in-pune/' }]}
+  jsonLd={[collectionLd(h1, description, jobs.map((j) => ({ name: j.title, href: url.job(jobSlug(j.company.slug, j.title, j.ats_job_id)) })), Astro.site)]}
+>
+  <JobRows jobs={jobs} />
+
+  <p class="muted" style="margin-top:2em">
+    Startup internships in Pune are posted in bursts rather than continuously. If this list is
+    short today, it is short because nothing is open — not because nothing was collected.
+    <a href="/rss.xml">Subscribe to the feed</a> to catch new ones.
+  </p>
+</ContentShell>

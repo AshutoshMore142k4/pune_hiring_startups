@@ -1,0 +1,43 @@
+---
+import BaseLayout from './BaseLayout.astro'
+import SiteFooter from '../components/SiteFooter.astro'
+import { breadcrumbLd } from '../data/seo'
+
+interface Props {
+  title: string
+  description: string
+  path: string
+  h1: string
+  lede?: string
+  crumbs?: { name: string; href: string }[]
+  jsonLd?: unknown[]
+  narrow?: boolean
+}
+
+const { title, description, path, h1, lede, crumbs = [], jsonLd = [], narrow = false } = Astro.props
+
+const trail = [{ name: 'Home', href: '/' }, ...crumbs]
+const blocks = crumbs.length ? [...jsonLd, breadcrumbLd(trail, Astro.site!)] : jsonLd
+---
+
+<BaseLayout title={title} description={description} path={path} jsonLd={blocks}>
+  <div class:list={['content', narrow && 'narrow']}>
+    {crumbs.length > 0 && (
+      <nav class="crumbs" aria-label="Breadcrumb">
+        {trail.map((c, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">/</span>}
+            {i === trail.length - 1 ? <span>{c.name}</span> : <a href={c.href}>{c.name}</a>}
+          </>
+        ))}
+      </nav>
+    )}
+
+    <h1>{h1}</h1>
+    {lede && <p class="lede">{lede}</p>}
+
+    <slot />
+  </div>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

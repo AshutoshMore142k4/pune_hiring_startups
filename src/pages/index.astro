@@ -1,0 +1,134 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import SiteFooter from '../components/SiteFooter.astro'
+import CompanyCard from '../components/CompanyCard.astro'
+import { areas, allJobs, loadAll, stats } from '../data/load'
+import { collectionLd, websiteLd } from '../data/seo'
+import { FUNCTIONS, timeAgo } from '@/lib/filters'
+import { jobSlug, url } from '../data/slugs'
+
+const companies = await loadAll()
+const s = await stats()
+const byArea = await areas()
+const latest = (await allJobs()).slice(0, 12)
+
+const sorted = [...companies].sort(
+  (a, b) => b.jobs.length - a.jobs.length || a.name.localeCompare(b.name),
+)
+
+const points = companies
+  .filter((c) => c.lat != null && c.lng != null)
+  .map((c) => ({ slug: c.slug, name: c.name, lat: c.lat, lng: c.lng, jobs: c.jobs.length }))
+
+const title = `Pune startup jobs — ${s.jobs} open roles at ${s.hiring} startups hiring now`
+const description =
+  `A live map of which Pune startups are hiring. ${s.jobs} open roles across ${s.hiring} of ` +
+  `${s.companies} tracked startups, pulled straight from company job feeds and refreshed every six hours.`
+
+const jsonLd = [
+  websiteLd(Astro.site!),
+  collectionLd(
+    'Pune startups hiring now',
+    description,
+    sorted.map((c) => ({ name: c.name, href: url.company(c.slug) })),
+    Astro.site!,
+  ),
+]
+---
+
+<BaseLayout title={title} description={description} path="/" jsonLd={jsonLd}>
+  <section class="map-shell">
+    <div id="map"></div>
+
+    <div class="panel" data-open="false">
+      <button class="grip" type="button" aria-label="Expand or collapse the results list"></button>
+
+      <div class="panel-head">
+        <h1 style="font-size:1.02rem;margin:0">Pune startups hiring right now</h1>
+        <p class="small muted" style="margin:0" id="result-count">
+          {s.companies} startups · {s.jobs} roles
+        </p>
+
+        <input id="search" class="search" type="search" placeholder="Search roles — backend, ML, intern…" aria-label="Search roles and startups" />
+
+        <div class="chips" role="group" aria-label="Filters">
+          <button class="chip" type="button" data-filter="flag" data-value="intern" aria-pressed="false">Intern</button>
+          <button class="chip" type="button" data-filter="flag" data-value="fresher" aria-pressed="false">0–2 yrs</button>
+          <button class="chip" type="button" data-filter="flag" data-value="remote" aria-pressed="false">Remote</button>
+          {Object.keys(FUNCTIONS).map((tag) => (
+            <button class="chip" type="button" data-filter="tag" data-value={tag} aria-pressed="false">{tag}</button>
+          ))}
+          <button class="chip" type="button" data-clear>Clear</button>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        {sorted.map((c) => <CompanyCard company={c} />)}
+        <p class="empty" id="empty" hidden>Nothing matches those filters. <button class="chip" type="button" data-clear>Clear them</button></p>
+      </div>
+
+      <div class="panel-foot">
+        <span><span class="dot"></span> hiring</span>
+        <span><span class="dot is-idle"></span> careers page only</span>
+        <span style="margin-left:auto">updated {timeAgo(s.updated)}</span>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/json" id="map-data" set:html={JSON.stringify(points)} is:inline></script>
+
+  <div class="content">
+    <h2>Browse Pune startups by area</h2>
+    <p class="lede">
+      Pune's startup hiring clusters around a handful of neighbourhoods. Pick one to see who is
+      hiring there.
+    </p>
+    <div class="grid">
+      {byArea.map((a) => (
+        <a class="tile" href={url.area(a.name)}>
+          <h3>Startups in {a.name}</h3>
+          <span class="meta">
+            {a.companies.length} {a.companies.length === 1 ? 'startup' : 'startups'} ·{' '}
+            {a.companies.reduce((n, c) => n + c.jobs.length, 0)} open roles
+          </span>
+        </a>
+      ))}
+    </div>
+
+    <h2 style="margin-top:2.2em">Browse by role</h2>
+    <div class="grid">
+      {Object.keys(FUNCTIONS).map((tag) => (
+        <a class="tile" href={url.role(tag)}>
+          <h3>{tag} jobs in Pune</h3>
+          <span class="meta">Across every tracked startup</span>
+        </a>
+      ))}
+      <a class="tile" href="/fresher-jobs-in-pune/">
+        <h3>Fresher jobs in Pune</h3>
+        <span class="meta">0–2 years of experience</span>
+      </a>
+      <a class="tile" href="/internships-in-pune/">
+        <h3>Internships in Pune</h3>
+        <span class="meta">Currently open</span>
+      </a>
+    </div>
+
+    <h2 style="margin-top:2.2em">Latest roles</h2>
+    <div class="rows">
+      {latest.map((j) => (
+        <a class="row" href={url.job(jobSlug(j.company.slug, j.title, j.ats_job_id))}>
+          <span class="title">{j.title}</span>
+          <span class="meta">{j.company.name} · {j.company.area ?? 'Pune'}</span>
+          <span class="at">seen {timeAgo(j.last_seen)}</span>
+        </a>
+      ))}
+    </div>
+    <p style="margin-top:14px"><a href={url.jobs()}>All {s.jobs} open roles &rarr;</a></p>
+  </div>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>
+
+<script>
+  import '../scripts/app.ts'
+</script>

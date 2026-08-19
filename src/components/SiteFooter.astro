@@ -1,0 +1,21 @@
+---
+import { url } from '../data/slugs'
+---
+
+<footer class="site-footer">
+  <div class="inner">
+    <p>
+      Job listings come from each company's own public ATS feed — Greenhouse, Lever, Ashby,
+      Workday, SmartRecruiters and Recruitee — refreshed every six hours. Applications happen
+      on the employer's site; we never take one.
+      <a href={url.about()}>How this works</a>.
+    </p>
+    <p>
+      <a href={url.companies()}>All startups</a> ·
+      <a href={url.jobs()}>Latest roles</a> ·
+      <a href="/rss.xml">RSS</a> ·
+      <a href="/data/jobs.json">JSON</a> ·
+      <a href="/sitemap.xml">Sitemap</a>
+    </p>
+  </div>
+</footer>

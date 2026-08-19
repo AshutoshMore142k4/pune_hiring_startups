@@ -1,0 +1,146 @@
+---
+import ContentShell from '../../layouts/ContentShell.astro'
+import { allJobs, type JobWithCompany } from '../../data/load'
+import { jobPostingLd } from '../../data/seo'
+import { jobSlug, url } from '../../data/slugs'
+import { jobFunctions, timeAgo } from '@/lib/filters'
+
+export async function getStaticPaths() {
+  // Only open roles get a page. Google is explicit that an expired listing must not stay
+  // reachable carrying JobPosting schema, and loadAll() already filters to is_open.
+  const jobs = await allJobs()
+  return jobs.map((job) => ({
+    params: { slug: jobSlug(job.company.slug, job.title, job.ats_job_id) },
+    props: { job },
+  }))
+}
+
+const { job } = Astro.props as { job: JobWithCompany }
+const company = job.company
+const slug = jobSlug(company.slug, job.title, job.ats_job_id)
+
+const everything = await allJobs()
+const sameCompany = everything
+  .filter((j) => j.company.slug === company.slug && j.ats_job_id !== job.ats_job_id)
+  .slice(0, 6)
+
+const tags = jobFunctions(job.title)
+
+// Round-robin by company rather than slice(0, 6): a straight slice returned six roles from
+// whichever company sorted first, which is a worse recommendation set and points every
+// internal link on this page at one company.
+const pool = everything.filter(
+  (j) => j.company.slug !== company.slug && jobFunctions(j.title).some((t) => tags.includes(t)),
+)
+const byCompany = new Map<string, JobWithCompany[]>()
+for (const j of pool) byCompany.set(j.company.slug, [...(byCompany.get(j.company.slug) ?? []), j])
+const lists = [...byCompany.values()]
+const similar: JobWithCompany[] = []
+for (let depth = 0; similar.length < 6 && depth < Math.max(0, ...lists.map((l) => l.length)); depth++) {
+  for (const list of lists) {
+    if (list[depth] && similar.length < 6) similar.push(list[depth])
+  }
+}
+
+const experience =
+  job.experience_min === null
+    ? null
+    : job.experience_max === null
+      ? `${job.experience_min}+ years`
+      : job.experience_min === job.experience_max
+        ? `${job.experience_min} years`
+        : `${job.experience_min}–${job.experience_max} years`
+
+const where = [job.location_raw, company.area].filter(Boolean)[0] ?? 'Pune'
+const title = `${job.title} at ${company.name} — ${where} | Startup Radar`
+const description = (
+  job.description?.replace(/\s+/g, ' ').slice(0, 155) ??
+  `${job.title} at ${company.name} in ${where}. Open role at a Pune startup.`
+).trim()
+
+const jsonLd = [jobPostingLd(job, company, Astro.site!, slug)]
+const crumbs = [
+  { name: 'Jobs', href: url.jobs() },
+  { name: company.name, href: url.company(company.slug) },
+  { name: job.title, href: url.job(slug) },
+]
+---
+
+<ContentShell
+  title={title}
+  description={description}
+  path={url.job(slug)}
+  h1={job.title}
+  crumbs={crumbs}
+  jsonLd={jsonLd}
+>
+  <p class="lede">
+    at <a href={url.company(company.slug)}>{company.name}</a>
+    {company.industry && <> · {company.industry}</>}
+  </p>
+
+  <dl class="factbox">
+    <div>
+      <dt>Location</dt>
+      <dd>{job.location_raw ?? 'Pune'}{company.area && <> · <a href={url.area(company.area)}>{company.area}</a></>}</dd>
+    </div>
+    {job.remote_type && (
+      <div><dt>Work setup</dt><dd style="text-transform:capitalize">{job.remote_type}</dd></div>
+    )}
+    {job.employment_type && (
+      <div><dt>Type</dt><dd>{job.employment_type.replace('_', ' ')}</dd></div>
+    )}
+    {experience && <div><dt>Experience</dt><dd>{experience}</dd></div>}
+    <div><dt>Last confirmed open</dt><dd>{timeAgo(job.last_seen)}</dd></div>
+  </dl>
+
+  <p>
+    <a class="apply" href={job.apply_url} target="_blank" rel="noopener nofollow">
+      Apply on {company.name}'s site &nearr;
+    </a>
+  </p>
+  <p class="small muted">
+    Applications are handled entirely by {company.name}. We never collect an application,
+    a CV or a fee.
+  </p>
+
+  {job.description && (
+    <>
+      <h2 style="margin-top:1.8em">About this role</h2>
+      <div class="prose">{job.description}</div>
+    </>
+  )}
+
+  {sameCompany.length > 0 && (
+    <>
+      <h2 style="margin-top:2em">Other open roles at {company.name}</h2>
+      <div class="rows">
+        {sameCompany.map((j) => (
+          <a class="row" href={url.job(jobSlug(j.company.slug, j.title, j.ats_job_id))}>
+            <span class="title">{j.title}</span>
+            <span class="meta">{j.location_raw ?? 'Pune'}</span>
+          </a>
+        ))}
+      </div>
+    </>
+  )}
+
+  {similar.length > 0 && (
+    <>
+      <h2 style="margin-top:2em">Similar roles at other Pune startups</h2>
+      <div class="rows">
+        {similar.map((j) => (
+          <a class="row" href={url.job(jobSlug(j.company.slug, j.title, j.ats_job_id))}>
+            <span class="title">{j.title}</span>
+            <span class="meta">{j.company.name} · {j.company.area ?? 'Pune'}</span>
+          </a>
+        ))}
+      </div>
+    </>
+  )}
+
+  <p class="small muted" style="margin-top:2em">
+    Listed from {company.name}'s public {company.ats} feed. Roles disappear from this site
+    once they stop appearing there.
+  </p>
+</ContentShell>

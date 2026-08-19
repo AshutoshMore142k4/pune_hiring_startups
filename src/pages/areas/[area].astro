@@ -1,0 +1,51 @@
+---
+import ContentShell from '../../layouts/ContentShell.astro'
+import JobRows from '../../components/JobRows.astro'
+import { areas, type CompanyWithJobs } from '../../data/load'
+import { collectionLd } from '../../data/seo'
+import { areaSlug, url } from '../../data/slugs'
+
+export async function getStaticPaths() {
+  const grouped = await areas()
+  return grouped.map((a) => ({ params: { area: areaSlug(a.name) }, props: { name: a.name, companies: a.companies } }))
+}
+
+const { name, companies } = Astro.props as { name: string; companies: CompanyWithJobs[] }
+
+const jobs = companies.flatMap(({ jobs, ...company }) => jobs.map((j) => ({ ...j, company })))
+const hiring = companies.filter((c) => c.jobs.length > 0)
+
+const h1 = `Startups hiring in ${name}, Pune`
+const description =
+  `${companies.length} startups in ${name}, Pune — ${hiring.length} of them hiring right now ` +
+  `across ${jobs.length} open roles. Updated every six hours.`
+---
+
+<ContentShell
+  title={`${h1} — ${jobs.length} open roles | Startup Radar`}
+  description={description}
+  path={url.area(name)}
+  h1={h1}
+  lede={description}
+  crumbs={[{ name: 'Areas', href: '/areas/' }, { name, href: url.area(name) }]}
+  jsonLd={[collectionLd(h1, description, companies.map((c) => ({ name: c.name, href: url.company(c.slug) })), Astro.site)]}
+>
+  <h2>Startups based in {name}</h2>
+  <div class="grid">
+    {companies.map((c) => (
+      <a class="tile" href={url.company(c.slug)}>
+        <h3>{c.name}</h3>
+        <span class="meta">{c.industry ?? 'Startup'}{c.headcount_band ? ` · ${c.headcount_band}` : ''}</span>
+        <span class:list={['badge', c.jobs.length === 0 && 'is-idle']}>
+          <span class:list={['dot', c.jobs.length === 0 && 'is-idle']}></span>
+          {c.jobs.length ? `${c.jobs.length} open` : 'careers page'}
+        </span>
+      </a>
+    ))}
+  </div>
+
+  <h2 style="margin-top:2em">Open roles in {name}</h2>
+  <JobRows jobs={jobs} />
+
+  <p style="margin-top:2em"><a href="/areas/">All Pune startup areas &rarr;</a></p>
+</ContentShell>

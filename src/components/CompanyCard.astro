@@ -1,0 +1,72 @@
+---
+import type { CompanyWithJobs } from '../data/load'
+import { jobFunctions } from '@/lib/filters'
+import { jobSlug, url } from '../data/slugs'
+
+interface Props { company: CompanyWithJobs }
+const { company: c } = Astro.props
+
+// Filter metadata rides on the element, so the island filters the DOM instead of carrying
+// a second copy of every job in a JSON blob.
+const tags = [...new Set(c.jobs.flatMap((j) => jobFunctions(j.title)))].join(' ')
+const search = [c.name, c.area, c.industry, ...c.jobs.map((j) => j.title)]
+  .filter(Boolean)
+  .join(' ')
+  .toLowerCase()
+const flag = (v: boolean) => (v ? '1' : '0')
+const meta = [c.area, c.industry].filter(Boolean).join(' · ')
+---
+
+<article
+  class="card"
+  data-slug={c.slug}
+  data-jobs={c.jobs.length}
+  data-tags={tags}
+  data-search={search}
+  data-fresher={flag(c.jobs.some((j) => j.experience_max !== null && j.experience_max <= 2))}
+  data-intern={flag(c.jobs.some((j) => j.employment_type === 'internship' || j.experience_max === 0))}
+  data-remote={flag(c.jobs.some((j) => j.remote_type === 'remote' || j.remote_type === 'hybrid'))}
+>
+  {c.jobs.length > 0 ? (
+    <details>
+      <summary class="card-head">
+        <span class="grow">
+          <h3>{c.name}</h3>
+          <span class="meta">{meta}</span>
+        </span>
+        <span class="badge"><span class="dot"></span>{c.jobs.length}</span>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+      </summary>
+
+      <ul class="joblist">
+        {c.jobs.slice(0, 8).map((j) => (
+          <li>
+            <a href={url.job(jobSlug(c.slug, j.title, j.ats_job_id))}>
+              {j.title}
+              <span class="where">{[j.location_raw, j.remote_type].filter(Boolean).join(' · ')}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <div class="card-foot">
+        <a class="linkout" href={url.company(c.slug)}>
+          {c.jobs.length > 8 ? `All ${c.jobs.length} roles at ${c.name}` : `About ${c.name}`} &rarr;
+        </a>
+      </div>
+    </details>
+  ) : (
+    <div>
+      <div class="card-head">
+        <span class="grow">
+          <h3>{c.name}</h3>
+          <span class="meta">{meta}</span>
+        </span>
+        <span class="badge is-idle"><span class="dot is-idle"></span>&mdash;</span>
+      </div>
+      <div class="card-foot">
+        <a class="linkout" href={url.company(c.slug)}>About {c.name} &rarr;</a>
+      </div>
+    </div>
+  )}
+</article>

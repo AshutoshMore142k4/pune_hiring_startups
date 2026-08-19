@@ -1,0 +1,40 @@
+---
+import ContentShell from '../../layouts/ContentShell.astro'
+import { byFunction } from '../../data/load'
+import { collectionLd } from '../../data/seo'
+import { url } from '../../data/slugs'
+import { FUNCTIONS, type FunctionTag } from '@/lib/filters'
+
+const tags = Object.keys(FUNCTIONS) as FunctionTag[]
+const counts = await Promise.all(tags.map(async (t) => ({ tag: t, n: (await byFunction(t)).length })))
+
+const h1 = 'Startup jobs in Pune by role'
+const description =
+  'Browse open roles at Pune startups by function — engineering, data and AI, product, ' +
+  'design, and go-to-market.'
+---
+
+<ContentShell
+  title={`${h1} | Startup Radar`}
+  description={description}
+  path="/roles/"
+  h1={h1}
+  lede={description}
+  crumbs={[{ name: 'Roles', href: '/roles/' }]}
+  jsonLd={[collectionLd(h1, description, tags.map((t) => ({ name: t, href: url.role(t) })), Astro.site)]}
+>
+  <div class="grid">
+    {counts.map(({ tag, n }) => (
+      <a class="tile" href={url.role(tag)}>
+        <h3>{tag} jobs in Pune</h3>
+        <span class="meta">{n} open {n === 1 ? 'role' : 'roles'}</span>
+      </a>
+    ))}
+    <a class="tile" href="/fresher-jobs-in-pune/">
+      <h3>Fresher jobs</h3><span class="meta">0–2 years of experience</span>
+    </a>
+    <a class="tile" href="/internships-in-pune/">
+      <h3>Internships</h3><span class="meta">Currently open</span>
+    </a>
+  </div>
+</ContentShell>

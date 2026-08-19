@@ -1,0 +1,34 @@
+---
+import ContentShell from '../../layouts/ContentShell.astro'
+import { areas } from '../../data/load'
+import { collectionLd } from '../../data/seo'
+import { url } from '../../data/slugs'
+
+const grouped = await areas()
+const h1 = 'Pune startup areas'
+const description =
+  'Pune startup hiring clusters into a handful of neighbourhoods — Hinjawadi, Baner, ' +
+  'Kharadi and a few more. Pick one to see which startups are there and who is hiring.'
+---
+
+<ContentShell
+  title={`${h1} — where Pune startups are | Startup Radar`}
+  description={description}
+  path="/areas/"
+  h1={h1}
+  lede={description}
+  crumbs={[{ name: 'Areas', href: '/areas/' }]}
+  jsonLd={[collectionLd(h1, description, grouped.map((a) => ({ name: a.name, href: url.area(a.name) })), Astro.site)]}
+>
+  <div class="grid">
+    {grouped.map((a) => (
+      <a class="tile" href={url.area(a.name)}>
+        <h3>{a.name}</h3>
+        <span class="meta">
+          {a.companies.length} {a.companies.length === 1 ? 'startup' : 'startups'} ·{' '}
+          {a.companies.reduce((n, c) => n + c.jobs.length, 0)} open roles
+        </span>
+      </a>
+    ))}
+  </div>
+</ContentShell>

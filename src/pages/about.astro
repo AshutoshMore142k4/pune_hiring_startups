@@ -1,0 +1,82 @@
+---
+import ContentShell from '../layouts/ContentShell.astro'
+import { loadAll, stats } from '../data/load'
+import { url } from '../data/slugs'
+
+const companies = await loadAll()
+const s = await stats()
+const feeds = companies.filter((c) => c.ats)
+const byAts = [...new Set(feeds.map((c) => c.ats))].sort()
+
+const description =
+  'How Startup Radar collects Pune startup jobs: public ATS feeds only, refreshed every six ' +
+  'hours, with the coverage limits stated plainly.'
+---
+
+<ContentShell
+  title="How Startup Radar works — methodology and coverage"
+  description={description}
+  path={url.about()}
+  h1="How this works"
+  lede={description}
+  crumbs={[{ name: 'About', href: url.about() }]}
+  narrow
+>
+  <h2>Where the listings come from</h2>
+  <p>
+    Every role on this site is read from the company's own public job feed — the syndication
+    endpoints that {byAts.join(', ')} publish so listings can be aggregated. Nothing is copied
+    from LinkedIn, Naukri or Wellfound, and nothing is scraped from a page that asked not to be.
+  </p>
+  <p>
+    A scheduled job re-reads every feed every six hours, and this site is rebuilt from the
+    result. Each role shows when it was last confirmed still open.
+  </p>
+
+  <h2>What the numbers mean</h2>
+  <p>
+    {s.companies} Pune startups are tracked. {feeds.length} of them publish a machine-readable
+    feed, which is why {s.hiring} currently show live roles and the rest show only a careers
+    link. That gap is not an oversight — most Indian startups use tools with no public feed, and
+    inventing listings for them would be worse than admitting the gap.
+  </p>
+
+  <h2>What we deliberately do not do</h2>
+  <ul>
+    <li>We never take an application, a CV, or a fee. Apply buttons go straight to the employer.</li>
+    <li>We do not rewrite job titles. What you see is what the employer published.</li>
+    <li>We do not keep closed roles alive. When a role leaves the feed, its page goes with it.</li>
+    <li>We do not guess at experience levels that a posting never stated.</li>
+  </ul>
+
+  <h2>Known limits</h2>
+  <ul>
+    <li>
+      Map pins are placed at neighbourhood centroids, not street addresses, and are nudged
+      apart so overlapping companies stay visible.
+    </li>
+    <li>
+      Experience filters read the role title and description with pattern matching. Treat them
+      as a shortcut, not a guarantee.
+    </li>
+    <li>
+      A "remote" role only appears here if it names India and no other metro. That drops some
+      genuinely open roles, which we prefer to filling a Pune map with jobs in other cities.
+    </li>
+  </ul>
+
+  <h2>Machine-readable</h2>
+  <p>
+    The full dataset is at <a href="/data/jobs.json">/data/jobs.json</a>, new roles are on
+    <a href="/rss.xml">RSS</a>, and every page is listed in the
+    <a href="/sitemap.xml">sitemap</a>. AI crawlers are welcome — see
+    <a href="/llms.txt">llms.txt</a>.
+  </p>
+
+  <h2>Corrections</h2>
+  <p>
+    If a company is listed in the wrong area, missing entirely, or should not be here at all,
+    that is a data problem worth fixing. The company list is curated by hand and is the one
+    part of this site a human maintains directly.
+  </p>
+</ContentShell>

@@ -1,0 +1,47 @@
+name: scrape
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'   # every 6h, off the hour (shared runners are busiest at :00)
+  workflow_dispatch:
+
+permissions:
+  contents: write            # for the heartbeat commit below
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsx scraper/run.ts
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+
+      # Push changed job URLs straight to Google/Bing instead of waiting to be crawled.
+      # Both channels no-op without their secrets, and a failed push must never fail the crawl.
+      - name: Ping search engines
+        continue-on-error: true
+        run: npx tsx scripts/ping-index.ts
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          SITE_URL: ${{ vars.SITE_URL }}
+          INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+
+      # GitHub disables scheduled workflows after 60 days with no repository activity.
+      # This scraper only writes to Supabase, so without a commit the cron dies silently.
+      - name: Heartbeat
+        run: |
+          date -u +'{"last_run":"%Y-%m-%dT%H:%M:%SZ"}' > data/heartbeat.json
+          git config user.name  'startup-radar-bot'
+          git config user.email 'bot@users.noreply.github.com'
+          git add data/heartbeat.json
+          git diff --staged --quiet || git commit -m 'chore: scrape heartbeat'
+          git push

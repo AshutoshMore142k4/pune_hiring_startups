@@ -1,0 +1,394 @@
+/* ---------------------------------------------------------------- tokens --
+   Full palette lives on bare :root. Dark redefines ONLY the values, twice:
+   once for the OS preference, once for an explicit choice, so the toggle wins
+   in both directions. Green is the only colour carrying meaning (= hiring).
+   -------------------------------------------------------------------------- */
+:root {
+  --bg: #fbfbfa;
+  --panel: #ffffff;
+  --panel-veil: rgba(255, 255, 255, 0.86);
+  --raise: #f5f4f1;
+  --line: #e6e4e0;
+  --line-strong: #d3d0ca;
+  --ink: #1a1a18;
+  --muted: #6b6862;
+  --accent: #1a1a18;
+  --accent-ink: #ffffff;
+  --live: #16a34a;
+  --live-soft: #e7f6ec;
+  --idle: #b8b4ae;
+  --map-bg: #eceae6;
+  --focus: #2563eb;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px rgba(0, 0, 0, 0.08);
+  --tiles: url('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png');
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0f1113;
+    --panel: #16181b;
+    --panel-veil: rgba(22, 24, 27, 0.86);
+    --raise: #1d2024;
+    --line: #2a2d31;
+    --line-strong: #3a3e44;
+    --ink: #e9e8e6;
+    --muted: #9a9791;
+    --accent: #e9e8e6;
+    --accent-ink: #0f1113;
+    --live: #22c55e;
+    --live-soft: #14301f;
+    --idle: #6b7076;
+    --map-bg: #0f1113;
+    --focus: #60a5fa;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0f1113;
+  --panel: #16181b;
+  --panel-veil: rgba(22, 24, 27, 0.86);
+  --raise: #1d2024;
+  --line: #2a2d31;
+  --line-strong: #3a3e44;
+  --ink: #e9e8e6;
+  --muted: #9a9791;
+  --accent: #e9e8e6;
+  --accent-ink: #0f1113;
+  --live: #22c55e;
+  --live-soft: #14301f;
+  --idle: #6b7076;
+  --map-bg: #0f1113;
+  --focus: #60a5fa;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* ------------------------------------------------------------------ base -- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Inter, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { line-height: 1.25; letter-spacing: -0.018em; margin: 0 0 .4em; }
+h1 { font-size: clamp(1.55rem, 1.2rem + 1.4vw, 2.1rem); font-weight: 660; }
+h2 { font-size: 1.2rem; font-weight: 640; }
+h3 { font-size: 1rem; font-weight: 620; }
+p { margin: 0 0 1em; }
+
+a { color: inherit; text-underline-offset: 2px; }
+a:hover { text-decoration-color: var(--muted); }
+
+:where(a, button, input, select, summary):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.nowrap { white-space: nowrap; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- header -- */
+.site-header {
+  position: sticky; top: 0; z-index: 1200;
+  display: flex; align-items: center; gap: 14px;
+  padding: 10px max(16px, env(safe-area-inset-left)) 10px 16px;
+  background: var(--panel-veil);
+  backdrop-filter: saturate(1.6) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .site-header { background: var(--panel); }
+}
+
+.brand {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-weight: 660; letter-spacing: -0.02em; text-decoration: none; white-space: nowrap;
+}
+.brand svg { display: block; }
+
+.site-nav { display: flex; gap: 4px; margin-left: auto; align-items: center; }
+.site-nav a {
+  padding: 6px 10px; border-radius: 8px; font-size: 13.5px;
+  color: var(--muted); text-decoration: none;
+}
+.site-nav a:hover { background: var(--raise); color: var(--ink); }
+.site-nav a[aria-current='page'] { color: var(--ink); background: var(--raise); }
+
+.theme-toggle {
+  display: grid; place-items: center;
+  width: 34px; height: 34px; padding: 0;
+  border: 1px solid var(--line); border-radius: 9px;
+  background: var(--panel); color: var(--ink); cursor: pointer;
+}
+.theme-toggle:hover { border-color: var(--line-strong); }
+.theme-toggle .moon { display: none; }
+:root[data-theme='dark'] .theme-toggle .moon { display: block; }
+:root[data-theme='dark'] .theme-toggle .sun { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .theme-toggle .moon { display: block; }
+  :root:not([data-theme='light']) .theme-toggle .sun { display: none; }
+}
+
+/* ------------------------------------------------------------- map shell -- */
+.map-shell { position: relative; height: calc(100dvh - 55px); overflow: hidden; }
+#map { position: absolute; inset: 0; background: var(--map-bg); }
+
+.panel {
+  position: absolute; z-index: 1100;
+  top: 14px; left: 14px; bottom: 14px; width: 384px;
+  display: flex; flex-direction: column;
+  background: var(--panel-veil);
+  backdrop-filter: saturate(1.6) blur(14px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .panel { background: var(--panel); }
+}
+
+.panel-head {
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid var(--line);
+  display: grid; gap: 9px;
+}
+.panel-body { overflow-y: auto; overscroll-behavior: contain; padding: 10px; flex: 1; }
+.panel-foot {
+  padding: 9px 12px; border-top: 1px solid var(--line);
+  display: flex; gap: 14px; align-items: center;
+  font-size: 12px; color: var(--muted);
+}
+
+.search {
+  width: 100%; padding: 9px 12px;
+  border: 1px solid var(--line); border-radius: 9px;
+  background: var(--bg); color: var(--ink); font: inherit; font-size: 14px;
+}
+.search::placeholder { color: var(--muted); }
+
+/* One row that scrolls, never three rows that wrap. */
+.chips {
+  display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
+  padding-bottom: 2px; margin: 0 -2px; padding-inline: 2px;
+  -webkit-overflow-scrolling: touch;
+}
+.chips::-webkit-scrollbar { display: none; }
+
+.chip {
+  flex: 0 0 auto;
+  padding: 5px 11px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--panel); color: var(--ink);
+  font: inherit; font-size: 12.5px; line-height: 1.5;
+  cursor: pointer; white-space: nowrap;
+  transition: background .12s, border-color .12s, color .12s;
+}
+.chip:hover { border-color: var(--line-strong); }
+.chip[aria-pressed='true'] {
+  background: var(--accent); color: var(--accent-ink); border-color: var(--accent);
+}
+
+/* -------------------------------------------------------------- the card -- */
+.card {
+  border: 1px solid var(--line); border-radius: 11px;
+  background: var(--panel); margin-bottom: 8px; overflow: hidden;
+}
+.card[data-active='true'] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+.card[hidden] { display: none; }
+
+/*
+  Native <details>/<summary>. The old markup was a div[role=button] wrapping <a> elements,
+  so clicking "Careers page" both navigated and toggled the card, and Space scrolled while
+  selecting. A summary is a real disclosure control: keyboard and screen-reader behaviour
+  come for free, the job links are siblings rather than children, and the content stays in
+  the DOM for crawlers with JavaScript off.
+*/
+.card summary { list-style: none; }
+.card summary::-webkit-details-marker { display: none; }
+
+.card-head {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 12px; cursor: pointer;
+}
+.card-head:hover { background: var(--raise); }
+.card-head .grow { flex: 1; min-width: 0; }
+.card-head h3 { margin: 0 0 1px; font-size: 14.5px; }
+.card-head .meta {
+  color: var(--muted); font-size: 12.5px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.card-head .chevron { flex: 0 0 auto; color: var(--muted); transition: transform .15s; margin-top: 2px; }
+.card details[open] .chevron, .card[data-active='true'] details[open] .chevron { transform: rotate(90deg); }
+
+.badge {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 8px; border-radius: 999px;
+  background: var(--live-soft); color: var(--live);
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+}
+.badge.is-idle { background: var(--raise); color: var(--muted); }
+
+.dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--live); display: inline-block; flex: 0 0 auto;
+}
+.dot.is-idle { background: var(--idle); }
+
+.joblist { list-style: none; margin: 0; padding: 0 12px 11px; display: grid; gap: 2px; }
+.joblist li a {
+  display: block; padding: 7px 8px; margin: 0 -8px; border-radius: 7px;
+  font-size: 13.5px; text-decoration: none;
+}
+.joblist li a:hover { background: var(--raise); text-decoration: underline; }
+.joblist li a .where { display: block; color: var(--muted); font-size: 12px; }
+
+.card-foot { padding: 0 12px 11px; }
+.linkout { font-size: 13px; color: var(--muted); text-decoration: none; }
+.linkout:hover { color: var(--ink); text-decoration: underline; }
+
+.empty { padding: 28px 16px; text-align: center; color: var(--muted); font-size: 14px; }
+
+/* --------------------------------------------------------- content shell -- */
+.content { max-width: 1080px; margin: 0 auto; padding: 26px 18px 72px; }
+.content.narrow { max-width: 72ch; }
+
+.crumbs { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12.5px; color: var(--muted); margin-bottom: 14px; }
+.crumbs a { text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+
+.lede { font-size: 16.5px; color: var(--muted); margin: -.2em 0 1.6em; max-width: 62ch; }
+
+.grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(268px, 1fr)); }
+
+.tile {
+  display: block; padding: 14px; border: 1px solid var(--line);
+  border-radius: 12px; background: var(--panel); text-decoration: none;
+  transition: border-color .12s, transform .12s;
+}
+.tile:hover { border-color: var(--line-strong); transform: translateY(-1px); }
+.tile h3 { margin: 0 0 3px; }
+.tile .meta { color: var(--muted); font-size: 12.5px; }
+.tile .badge { margin-top: 9px; }
+
+.rows { display: grid; gap: 8px; }
+.row {
+  display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  padding: 12px 14px; border: 1px solid var(--line); border-radius: 11px;
+  background: var(--panel); text-decoration: none;
+}
+.row:hover { border-color: var(--line-strong); }
+.row .title { font-weight: 580; }
+.row .meta { color: var(--muted); font-size: 13px; }
+.row .at { margin-left: auto; color: var(--muted); font-size: 12.5px; }
+
+.prose { white-space: pre-line; max-width: 68ch; }
+.prose::first-line { font-weight: inherit; }
+
+.apply {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 18px; border-radius: 10px;
+  background: var(--accent); color: var(--accent-ink);
+  font-weight: 600; text-decoration: none;
+}
+.apply:hover { opacity: .9; }
+
+.factbox {
+  display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  padding: 14px; border: 1px solid var(--line); border-radius: 12px;
+  background: var(--raise); margin: 0 0 22px;
+}
+.factbox div { min-width: 0; }
+.factbox dt { color: var(--muted); font-size: 12px; margin-bottom: 2px; }
+.factbox dd { margin: 0; font-size: 14px; }
+
+.site-footer {
+  border-top: 1px solid var(--line); margin-top: 40px;
+  padding: 22px 18px 34px; color: var(--muted); font-size: 13px;
+}
+.site-footer .inner { max-width: 1080px; margin: 0 auto; display: grid; gap: 8px; }
+.site-footer a { text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
+
+/* -------------------------------------------------------------- leaflet -- */
+/* leaflet.css hardcodes white; without these the map chrome glares in dark mode. */
+.leaflet-container { background: var(--map-bg); font: inherit; }
+.leaflet-control-zoom { border: 1px solid var(--line) !important; border-radius: 9px !important; overflow: hidden; }
+.leaflet-control-zoom a {
+  background: var(--panel); color: var(--ink); border-bottom-color: var(--line);
+}
+.leaflet-control-zoom a:hover { background: var(--raise); color: var(--ink); }
+.leaflet-control-attribution {
+  background: var(--panel-veil) !important; color: var(--muted) !important;
+  font-size: 10.5px; padding: 1px 6px;
+}
+.leaflet-control-attribution a { color: var(--muted) !important; }
+.leaflet-tooltip {
+  background: var(--panel); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 7px;
+  box-shadow: var(--shadow); font-size: 12.5px; padding: 4px 8px;
+}
+.leaflet-tooltip::before { display: none; }
+
+/* Dark basemaps are lighter than the UI; dim them so markers stay the brightest thing. */
+:root[data-theme='dark'] .leaflet-tile-pane { filter: brightness(0.92); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .leaflet-tile-pane { filter: brightness(0.92); }
+}
+
+/* --------------------------------------------------------------- mobile -- */
+@media (max-width: 900px) {
+  .map-shell { height: calc(100dvh - 55px); }
+
+  /* Bottom sheet: two snap states, toggled by the grip. */
+  .panel {
+    top: auto; left: 0; right: 0; bottom: 0; width: auto;
+    border-radius: 16px 16px 0 0;
+    border-bottom: 0;
+    height: 78dvh;
+    transform: translateY(calc(78dvh - 118px));
+    transition: transform .26s cubic-bezier(.32, .72, 0, 1);
+  }
+  .panel[data-open='true'] { transform: translateY(0); }
+
+  .grip {
+    display: block; width: 100%; padding: 9px 12px 4px;
+    border: 0; background: none; color: inherit; cursor: pointer;
+  }
+  .grip::before {
+    content: ''; display: block; width: 38px; height: 4px; margin: 0 auto 7px;
+    border-radius: 99px; background: var(--line-strong);
+  }
+  .panel-foot { display: none; }
+  .site-nav a { display: none; }
+  .site-nav a.keep { display: block; }
+}
+
+@media (min-width: 901px) {
+  .grip { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

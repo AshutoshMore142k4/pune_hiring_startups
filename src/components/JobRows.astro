@@ -1,0 +1,28 @@
+---
+import type { JobWithCompany } from '../data/load'
+import { jobSlug, url } from '../data/slugs'
+import { timeAgo } from '@/lib/filters'
+
+interface Props { jobs: JobWithCompany[]; showCompany?: boolean }
+const { jobs, showCompany = true } = Astro.props
+---
+
+{jobs.length === 0 ? (
+  <p class="muted">
+    Nothing open right now. Listings refresh every six hours — or browse
+    <a href={url.jobs()}>every open role</a>.
+  </p>
+) : (
+  <div class="rows">
+    {jobs.map((j) => (
+      <a class="row" href={url.job(jobSlug(j.company.slug, j.title, j.ats_job_id))}>
+        <span class="title">{j.title}</span>
+        <span class="meta">
+          {showCompany && <>{j.company.name} · </>}
+          {j.company.area ?? j.location_raw ?? 'Pune'}
+        </span>
+        <span class="at">seen {timeAgo(j.last_seen)}</span>
+      </a>
+    ))}
+  </div>
+)}
