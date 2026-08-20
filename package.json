@@ -22,6 +22,7 @@
     "@types/leaflet": "^1.9.12",
     "@types/node": "^22.10.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "wrangler": "^4.124.0"
   }
 }
