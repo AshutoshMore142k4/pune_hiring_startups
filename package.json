@@ -7,9 +7,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "detect": "tsx scraper/detect.ts",
-    "scrape": "tsx scraper/run.ts",
-    "seed": "tsx scraper/seed.ts",
-    "ping": "tsx scripts/ping-index.ts",
+    "scrape": "tsx --env-file-if-exists=.env scraper/run.ts",
+    "seed": "tsx --env-file-if-exists=.env scraper/seed.ts",
+    "ping": "tsx --env-file-if-exists=.env scripts/ping-index.ts",
     "test": "tsx --test scraper/*.test.ts",
     "fixture": "tsx scripts/fixture-server.ts"
   },
