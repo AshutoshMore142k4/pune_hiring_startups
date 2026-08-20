@@ -1,0 +1,154 @@
+---
+import ContentShell from '../layouts/ContentShell.astro'
+import { url } from '../data/slugs'
+
+const UPDATED = '19 August 2026'
+const CONTACT = import.meta.env.PUBLIC_CONTACT_EMAIL ?? 'hello@punehire.com'
+
+const description =
+  'Terms of use for Punehire: no warranty on listing accuracy, no application is ever ' +
+  'taken, no fee is ever charged, and what the listings actually are.'
+---
+
+<ContentShell
+  title="Terms of use | Punehire"
+  description={description}
+  path="/terms/"
+  h1="Terms of use"
+  lede="Punehire is an index of job listings published by other companies. These terms describe what that means for you and the limits of what this site promises."
+  crumbs={[{ name: 'Terms', href: '/terms/' }]}
+  narrow
+>
+  <p class="small muted">Last updated {UPDATED}.</p>
+
+  <p>
+    By using this site you accept what is written here. If you do not, the site costs you
+    nothing to leave.
+  </p>
+
+  <h2>What this site is</h2>
+  <p>
+    Punehire reads the public job feeds that startups in Pune publish through their
+    applicant tracking systems, and arranges them into one index with company, area and role
+    pages. The listings are the employers' own. What we add is the collection, the
+    normalisation, the freshness dates and the structure around them.
+  </p>
+
+  <h2>What this site is not</h2>
+  <ul>
+    <li>
+      <strong>Not a recruiter, not a staffing agency, not a consultancy.</strong> We do not
+      represent candidates, we do not represent employers, and we are paid by neither.
+    </li>
+    <li>
+      <strong>Not an employer.</strong> Nothing here is an offer of employment or a promise
+      that one will follow.
+    </li>
+    <li>
+      <strong>Not an application route.</strong> No application, CV, phone number or document
+      is ever collected on this site. Every apply button leaves for the employer's own system.
+    </li>
+    <li>
+      <strong>Never paid for by you.</strong> There is no fee, no subscription, no premium
+      tier and no paid placement. Anyone asking you to pay in order to apply to a role you
+      found here is not us.
+    </li>
+  </ul>
+
+  <h2>The listings belong to the employers</h2>
+  <p>
+    Job titles, descriptions and application links are published by each company and remain
+    theirs. Titles are passed through unchanged. Company names and logos are the marks of
+    their owners and are used only to say which company is hiring. Punehire claims no
+    ownership of that material and no affiliation with the companies listed.
+  </p>
+  <p>
+    If you are an employer and want a listing or a company page removed, write to
+    <a href={`mailto:${CONTACT}`}>{CONTACT}</a>. It gets removed. See
+    <a href="/contact/">contact and corrections</a> for what to include.
+  </p>
+
+  <h2>Accuracy, staleness and no warranty</h2>
+  <p>
+    The feeds are re-read every six hours and the site is rebuilt from the result, so a role
+    can close in the gap between two crawls. Each role shows when it was last confirmed still
+    open; treat that date as the real claim being made, and treat the listing itself as a
+    pointer to the employer's page rather than a statement of current fact.
+  </p>
+  <p>
+    Some fields on this site are derived rather than published. Experience ranges, role
+    function tags, remote classification and area assignments are produced by pattern
+    matching and by a hand-maintained company list. They are useful for filtering and they
+    are wrong sometimes. The limits are described in
+    <a href={url.about()}>how this works</a>.
+  </p>
+  <p>
+    The site is provided as is, without any warranty. We do not guarantee that a listing is
+    accurate, current, complete, still open, or genuine. Verify anything that matters on the
+    employer's own site before you act on it. To the extent the law allows, we are not liable
+    for any loss arising from your use of this site, from a listing that turned out to be
+    stale or wrong, or from anything that happens on a site we linked to.
+  </p>
+
+  <h2>Applying happens elsewhere</h2>
+  <p>
+    Clicking apply takes you to a third-party applicant tracking system such as Greenhouse,
+    Lever, Ashby, Workday, SmartRecruiters or Recruitee, or to the company's own careers page.
+    From that point their terms and their privacy policy govern, not ours, and we have no
+    visibility into your application or its outcome. We receive no fee, no commission and no
+    referral payment for any application, hire or click.
+  </p>
+
+  <h2>Scams and misrepresentation</h2>
+  <p>
+    Listings are taken from official employer feeds rather than from open submissions, which
+    keeps most fraudulent postings out. It does not make the site immune. A legitimate
+    employer never asks a candidate for a registration fee, a training deposit, or payment for
+    equipment or a background check. If something reached this index that should not have,
+    report it and it will be pulled.
+  </p>
+
+  <h2>Acceptable use</h2>
+  <ul>
+    <li>Read it, search it, share links to it, use it in your own job hunt or hiring research. All fine.</li>
+    <li>
+      Need the data in bulk? Take <a href="/data/jobs.json">/data/jobs.json</a> in a single
+      request instead of crawling the pages. That is what it is there for.
+    </li>
+    <li>
+      Do not republish the index wholesale as your own, and do not use it to build a mailing
+      list or to contact candidates or companies without their consent.
+    </li>
+    <li>
+      Do not attempt to disrupt the site, and do not use automated traffic in a way that
+      degrades it for other people.
+    </li>
+  </ul>
+
+  <h2>Changes to this site</h2>
+  <p>
+    Pages appear and disappear as roles open and close, by design. A closed role does not keep
+    a page here. The site itself may change or stop, without notice and without obligation.
+  </p>
+
+  <h2>Governing law</h2>
+  <p>
+    These terms are governed by the laws of India, and the courts at Pune, Maharashtra have
+    jurisdiction. If any part of this page turns out to be unenforceable, the rest still
+    stands.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    <a href={`mailto:${CONTACT}`}>{CONTACT}</a>. Related:
+    <a href="/privacy/">privacy policy</a>,
+    <a href="/disclaimer/">disclaimer</a>,
+    <a href="/contact/">contact and corrections</a>.
+  </p>
+</ContentShell>
+
+<style>
+  h2 { margin-top: 1.9em; }
+  ul { padding-left: 1.15em; margin: 0 0 1em; }
+  li { margin-bottom: .45em; }
+</style>

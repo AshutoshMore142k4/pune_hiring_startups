@@ -1,0 +1,72 @@
+---
+import ContentShell from '../../layouts/ContentShell.astro'
+import { loadEnterprises, enterpriseStats } from '../../data/load'
+import { collectionLd } from '../../data/seo'
+import { url } from '../../data/slugs'
+
+/**
+ * The large-employer counterpart to the startup map. These are the IT-services firms, GCCs and
+ * banks the startup map deliberately excludes — kept here in their own section so the map stays
+ * a startup map. Companies with a readable Pune feed show live role counts; the rest link out.
+ * Roles here are whatever the employer's feed carries (usually lateral, not campus-fresher).
+ */
+const companies = (await loadEnterprises()).sort(
+  (a, b) => b.jobs.length - a.jobs.length || a.name.localeCompare(b.name),
+)
+const s = await enterpriseStats()
+
+const h1 = 'IT companies & big employers hiring in Pune'
+const description =
+  `The large IT-services firms, GCCs and banks hiring in Pune — ${s.companies} tracked, ` +
+  `${s.hiring} with open roles in a readable feed right now. Each links straight to the ` +
+  `employer's own application page.`
+---
+
+<ContentShell
+  title={`${h1} | Punehire`}
+  description={description}
+  path={url.enterprises()}
+  h1={h1}
+  lede={description}
+  crumbs={[{ name: 'IT companies', href: url.enterprises() }]}
+  jsonLd={[collectionLd(h1, description, companies.map((c) => ({ name: c.name, href: url.company(c.slug) })), Astro.site)]}
+>
+  <p>
+    This is the counterpart to the <a href="/">startup hiring map</a>. That map deliberately
+    tracks Pune's product startups and leaves out the large services companies, GCCs and banks —
+    the campuses in Hinjawadi and Kharadi that hire in hundreds. Plenty of people searching for
+    work in Pune want exactly those employers, so they live here instead, in their own section,
+    rather than crowding the startup map.
+  </p>
+  <p>
+    The same rule applies as everywhere on this site: a company shows live roles only if it
+    publishes a machine-readable feed this crawler can read, and only its <strong>Pune</strong>
+    roles are listed. Where a feed is not readable, the company still appears with a link to its
+    own careers page. Nothing here is invented, and the roles a big employer publishes to a feed
+    are usually experienced or lateral positions — their fresher and campus hiring runs through
+    separate drives that no public feed carries.
+  </p>
+
+  {companies.length > 0 ? (
+    <div class="grid" style="margin-top:1.6em">
+      {companies.map((c) => (
+        <a class="tile" href={url.company(c.slug)}>
+          <h3>{c.name}</h3>
+          <span class="meta">{[c.area, c.industry].filter(Boolean).join(' · ')}</span>
+          <span class:list={['badge', c.jobs.length === 0 && 'is-idle']}>
+            <span class:list={['dot', c.jobs.length === 0 && 'is-idle']}></span>
+            {c.jobs.length ? `${c.jobs.length} open ${c.jobs.length === 1 ? 'role' : 'roles'}` : 'careers page only'}
+          </span>
+        </a>
+      ))}
+    </div>
+  ) : (
+    <p class="muted" style="margin-top:1.6em">No large employers are tracked here yet.</p>
+  )}
+
+  <p class="small muted" style="margin-top:2em">
+    Looking for smaller, product companies instead? The{' '}
+    <a href="/">Pune startup hiring map</a> and the{' '}
+    <a href="/fresher-jobs-in-pune/">fresher jobs page</a> are the place to start.
+  </p>
+</ContentShell>

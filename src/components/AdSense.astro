@@ -1,0 +1,27 @@
+---
+/**
+ * The single AdSense tag. Auto ads reads it and places every unit itself, so there are no
+ * manual ad slots anywhere in this codebase and none should be added.
+ *
+ * Switch PUBLIC_ADSENSE_CLIENT on only AFTER AdSense approves the site. Before approval the
+ * script renders nothing, so all it does is put an unapproved third-party script on every page
+ * a reviewer is currently judging. Site ownership is verified by /ads.txt instead, which is one
+ * of the three methods Google accepts and needs no script.
+ *
+ * Do not add targeting or custom channels keyed to job-seeker intent: Google's personalised
+ * advertising policy names employment as a restricted category. Stock Auto ads is compliant;
+ * anything built on top of it may not be.
+ */
+const client = import.meta.env.PUBLIC_ADSENSE_CLIENT
+---
+
+{
+  client && (
+    <script
+      is:inline
+      async
+      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`}
+      crossorigin="anonymous"
+    />
+  )
+}

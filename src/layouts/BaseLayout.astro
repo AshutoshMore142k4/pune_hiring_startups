@@ -2,6 +2,8 @@
 import '../styles/global.css'
 import { SITE_NAME } from '../data/seo'
 import { url } from '../data/slugs'
+import Analytics from '../components/Analytics.astro'
+import AdSense from '../components/AdSense.astro'
 
 interface Props {
   title: string
@@ -55,7 +57,14 @@ const here = Astro.url.pathname
     <meta name="theme-color" content="#fbfbfa" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0f1113" media="(prefers-color-scheme: dark)" />
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- Favicons. The generated set + a 192px PNG, which Google Search prefers for the result favicon. -->
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="icon" href="/icon-192.png" sizes="192x192" type="image/png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="punehire" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title={`${SITE_NAME} — new roles`} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap.xml" />
     <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin />
@@ -63,6 +72,9 @@ const here = Astro.url.pathname
     {jsonLd.map((block) => (
       <script type="application/ld+json" set:html={JSON.stringify(block)} />
     ))}
+
+    <Analytics />
+    <AdSense />
   </head>
 
   <body>

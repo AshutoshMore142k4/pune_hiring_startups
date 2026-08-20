@@ -1,0 +1,120 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import SiteFooter from '../components/SiteFooter.astro'
+import { areas, loadAll, stats } from '../data/load'
+import { url } from '../data/slugs'
+import { FUNCTIONS, type FunctionTag } from '@/lib/filters'
+
+/**
+ * BaseLayout directly, not ContentShell: a 404 needs `noindex` (ContentShell does not pass it
+ * through) and a breadcrumb trail to a page that does not exist would be a lie.
+ */
+
+const [companies, grouped, s] = await Promise.all([loadAll(), areas(), stats()])
+const tags = Object.keys(FUNCTIONS) as FunctionTag[]
+
+/**
+ * The likeliest 404 on this site is a job page whose role closed. jobSlug() builds
+ * `${companySlug}-${slugify(title)}-${hash}`, so the company slug is a prefix of the dead URL.
+ * Sorted longest first so the first match is the longest one — "acme" must not win over
+ * "acme-labs". Progressive enhancement: without JavaScript the static links below still work.
+ */
+const lookup = companies
+  .map((c) => ({ slug: c.slug, name: c.name, href: url.company(c.slug) }))
+  .sort((a, b) => b.slug.length - a.slug.length)
+
+const description =
+  'That page is not on Punehire. If it was a job, the role has most likely closed. ' +
+  'Here is where the current ones are.'
+---
+
+<BaseLayout title="Page not found | Punehire" description={description} path="/404.html" noindex>
+  <div class="content">
+    <h1>Page not found</h1>
+    <p class="lede">
+      Nothing lives at this address. If you followed a link to a job, the role has most likely
+      closed.
+    </p>
+
+    <p id="closed" hidden>
+      That link was a role at <a id="closed-link" href={url.companies()}></a>. Whatever is open
+      there now is on the company page.
+    </p>
+
+    <p class="say">
+      A job page here exists only while the role sits in the employer's own feed. When a role is
+      filled or withdrawn it leaves the feed, and the page goes with it. We do not keep closed
+      roles alive to hold on to the search traffic, so an old link from Google or a bookmark
+      lands here.
+    </p>
+
+    <h2>Where to go instead</h2>
+    <div class="grid">
+      <a class="tile" href={url.home()}>
+        <h3>The hiring map</h3>
+        <span class="meta">{s.hiring} of {s.companies} startups have a live role</span>
+      </a>
+      <a class="tile" href={url.jobs()}>
+        <h3>Latest roles</h3>
+        <span class="meta">{s.jobs} open across Pune, newest first</span>
+      </a>
+      <a class="tile" href={url.companies()}>
+        <h3>All startups</h3>
+        <span class="meta">{s.companies} tracked, hiring or not</span>
+      </a>
+    </div>
+
+    <h2>By area</h2>
+    <p class="tags">
+      {grouped.map((a) => (
+        <a class="chip" href={url.area(a.name)}>{a.name}</a>
+      ))}
+      <a class="chip" href="/areas/">All areas</a>
+    </p>
+
+    <h2>By role</h2>
+    <p class="tags">
+      {tags.map((t) => (
+        <a class="chip" href={url.role(t)}>{t}</a>
+      ))}
+      <a class="chip" href="/fresher-jobs-in-pune/">freshers</a>
+      <a class="chip" href="/internships-in-pune/">internships</a>
+    </p>
+
+    <p class="say small muted">
+      If a page that should exist is missing — a company dropped, a link broken —
+      <a href={url.about()}>how this works</a> sets out where the data comes from and what it
+      does not cover.
+    </p>
+  </div>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>
+
+<script define:vars={{ lookup }}>
+  const m = /^\/jobs\/([^/]+)\/?$/.exec(location.pathname)
+  const hit = m && lookup.find((c) => m[1].startsWith(c.slug + '-'))
+  if (hit) {
+    const link = document.getElementById('closed-link')
+    link.href = hit.href
+    link.textContent = hit.name
+    document.getElementById('closed').hidden = false
+  }
+</script>
+
+<style>
+  .say { max-width: 62ch; }
+  h2 { margin-top: 28px; }
+
+  #closed {
+    max-width: 62ch;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--raise);
+  }
+
+  /* .chips scrolls in one row by design; here the list is short and wrapping reads better. */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  a.chip { text-decoration: none; }
+</style>

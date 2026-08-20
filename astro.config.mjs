@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config'
 
 // Override at build time once a real domain is attached in Cloudflare Pages.
-const site = process.env.SITE_URL ?? 'https://startup-radar.pages.dev'
+const site = process.env.SITE_URL ?? 'https://punehire.pages.dev'
 
 export default defineConfig({
   site,

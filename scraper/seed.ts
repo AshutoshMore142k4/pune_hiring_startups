@@ -13,6 +13,7 @@ const rows = parseCsv(readFileSync('seed/companies.csv', 'utf8')).map((r) => ({
   careers_url: r.careers_url,
   ats: str(r.ats),
   ats_slug: str(r.ats_slug),
+  kind: r.kind === 'enterprise' ? 'enterprise' : 'startup',
   area: str(r.area),
   lat: num(r.lat),
   lng: num(r.lng),

@@ -12,7 +12,7 @@ export const GET: APIRoute = async ({ site }) => {
   const abs = (p: string) => new URL(p, site).href
 
   const body = {
-    name: 'Startup Radar',
+    name: 'Punehire',
     description: 'Open roles at startups in Pune, India, read from public company ATS feeds.',
     homepage: abs('/'),
     licence: 'Listings belong to their employers. Attribution appreciated.',

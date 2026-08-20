@@ -3,6 +3,8 @@ import ContentShell from '../../layouts/ContentShell.astro'
 import JobRows from '../../components/JobRows.astro'
 import { byFunction } from '../../data/load'
 import { collectionLd } from '../../data/seo'
+import { roleFaq, faqPageLd } from '../../data/faq'
+import Faq from '../../components/Faq.astro'
 import { jobSlug, slugify, url } from '../../data/slugs'
 import { FUNCTIONS, type FunctionTag } from '@/lib/filters'
 
@@ -21,6 +23,7 @@ const LABELS: Record<string, string> = {
   'sales/gtm': 'Sales and go-to-market',
 }
 const label = LABELS[tag] ?? tag
+const faq = await roleFaq(tag, label)
 
 const companies = [...new Set(jobs.map((j) => j.company.name))]
 const h1 = `${label} jobs at Pune startups`
@@ -30,13 +33,16 @@ const description =
 ---
 
 <ContentShell
-  title={`${h1} — ${jobs.length} open roles | Startup Radar`}
+  title={`${h1} — ${jobs.length} open roles | Punehire`}
   description={description}
   path={url.role(tag)}
   h1={h1}
   lede={description}
   crumbs={[{ name: 'Roles', href: '/roles/' }, { name: label, href: url.role(tag) }]}
-  jsonLd={[collectionLd(h1, description, jobs.map((j) => ({ name: j.title, href: url.job(jobSlug(j.company.slug, j.title, j.ats_job_id)) })), Astro.site)]}
+  jsonLd={[
+    collectionLd(h1, description, jobs.map((j) => ({ name: j.title, href: url.job(jobSlug(j.company.slug, j.title, j.ats_job_id)) })), Astro.site),
+    faqPageLd(faq, Astro.site, url.role(tag)),
+  ]}
 >
   <JobRows jobs={jobs} />
 
@@ -45,4 +51,6 @@ const description =
       Hiring for {label.toLowerCase()} right now: {companies.join(', ')}.
     </p>
   )}
+
+  <Faq items={faq} heading={`${label} jobs in Pune — FAQ`} />
 </ContentShell>

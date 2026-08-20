@@ -1,4 +1,4 @@
-# Startup Radar
+# Punehire
 
 A live map of which Pune startups are hiring right now. Runs on free tiers: static site on
 Cloudflare Pages, Supabase Postgres, a GitHub Actions cron every 6 hours. No server.

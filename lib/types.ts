@@ -1,8 +1,12 @@
 export const ATS_NAMES = [
   'greenhouse', 'lever', 'ashby', 'workday', 'smartrecruiters', 'recruitee',
+  'oracle', 'phenom', 'successfactors',
 ] as const
 
 export type Ats = (typeof ATS_NAMES)[number]
+
+/** 'enterprise' companies render in a separate section and are kept off the startup map. */
+export type CompanyKind = 'startup' | 'enterprise'
 
 export type Company = {
   id: number
@@ -12,6 +16,7 @@ export type Company = {
   careers_url: string
   ats: Ats | null
   ats_slug: string | null
+  kind: CompanyKind
   area: string | null
   lat: number | null
   lng: number | null

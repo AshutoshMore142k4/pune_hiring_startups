@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Company, Job } from '@/lib/types'
-import { jobFunctions, type FunctionTag } from '@/lib/filters'
+import { FUNCTIONS, jobFunctions, type FunctionTag } from '@/lib/filters'
+import { slugify } from './slugs'
 
 export type CompanyWithJobs = Company & { jobs: Job[] }
 export type JobWithCompany = Job & { company: Company }
@@ -11,7 +12,13 @@ const key = import.meta.env.SUPABASE_ANON_KEY ?? process.env.SUPABASE_ANON_KEY
 // One fetch for the whole build: every getStaticPaths shares this.
 let cache: CompanyWithJobs[] | null = null
 
-export async function loadAll(): Promise<CompanyWithJobs[]> {
+/**
+ * Every company, startups and enterprises together. Cached — the single Supabase read for
+ * the whole build. The kind-filtered views below all derive from this, so the startup
+ * surfaces (map, home, areas, roles) can stay startup-only while the enterprise section
+ * gets its own, without a second query.
+ */
+export async function loadEvery(): Promise<CompanyWithJobs[]> {
   if (cache) return cache
 
   if (!url || !key) {
@@ -42,11 +49,34 @@ export async function loadAll(): Promise<CompanyWithJobs[]> {
   return cache
 }
 
-export async function allJobs(): Promise<JobWithCompany[]> {
-  const companies = await loadAll()
-  return companies
+/** Startups only — the default view. Every existing consumer (map, home, areas, roles) uses this. */
+export async function loadAll(): Promise<CompanyWithJobs[]> {
+  return (await loadEvery()).filter((c) => c.kind !== 'enterprise')
+}
+
+/** Big employers only — the separate enterprise section. */
+export async function loadEnterprises(): Promise<CompanyWithJobs[]> {
+  return (await loadEvery()).filter((c) => c.kind === 'enterprise')
+}
+
+const jobsOf = (companies: CompanyWithJobs[]): JobWithCompany[] =>
+  companies
     .flatMap(({ jobs, ...company }) => jobs.map((j) => ({ ...j, company: company as Company })))
     .sort((a, b) => (b.first_seen ?? '').localeCompare(a.first_seen ?? ''))
+
+/** Startup jobs, newest first. Unchanged behaviour. */
+export async function allJobs(): Promise<JobWithCompany[]> {
+  return jobsOf(await loadAll())
+}
+
+/** Enterprise jobs, newest first. */
+export async function enterpriseJobs(): Promise<JobWithCompany[]> {
+  return jobsOf(await loadEnterprises())
+}
+
+/** Every job across both kinds — for the two per-entity getStaticPaths and the sitemap only. */
+export async function everyJob(): Promise<JobWithCompany[]> {
+  return jobsOf(await loadEvery())
 }
 
 export async function areas(): Promise<{ name: string; companies: CompanyWithJobs[] }[]> {
@@ -68,8 +98,7 @@ export async function byFunction(tag: FunctionTag): Promise<JobWithCompany[]> {
   return (await allJobs()).filter((j) => jobFunctions(j.title).includes(tag))
 }
 
-export async function stats() {
-  const companies = await loadAll()
+function statsOf(companies: CompanyWithJobs[]) {
   const jobs = companies.flatMap((c) => c.jobs)
   const crawled = companies.map((c) => c.last_crawled_at).filter(Boolean).sort()
   return {
@@ -78,4 +107,14 @@ export async function stats() {
     jobs: jobs.length,
     updated: (crawled.at(-1) as string | undefined) ?? null,
   }
+}
+
+/** Startup stats — homepage numbers. Unchanged. */
+export async function stats() {
+  return statsOf(await loadAll())
+}
+
+/** Enterprise-section stats. */
+export async function enterpriseStats() {
+  return statsOf(await loadEnterprises())
 }

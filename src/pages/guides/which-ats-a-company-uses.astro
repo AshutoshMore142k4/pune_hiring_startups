@@ -1,0 +1,147 @@
+---
+import ContentShell from '../../layouts/ContentShell.astro'
+import { loadAll, stats } from '../../data/load'
+import { SITE_NAME } from '../../data/seo'
+import { url } from '../../data/slugs'
+import { GUIDES, articleLd, guideUrl, otherGuides } from '../../data/guides'
+import type { CompanyWithJobs } from '../../data/load'
+
+const guide = GUIDES.find((g) => g.slug === 'which-ats-a-company-uses')!
+
+const companies = await loadAll()
+const s = await stats()
+const feeds = companies.filter((c) => c.ats)
+const noFeed = companies.filter((c) => !c.ats)
+
+const byAts = new Map<string, CompanyWithJobs[]>()
+for (const c of feeds) byAts.set(c.ats!, [...(byAts.get(c.ats!) ?? []), c])
+
+/** Quickest to slowest, which is the order that matters when you are deciding what to apply to. */
+const ORDER = ['greenhouse', 'lever', 'ashby', 'recruitee', 'smartrecruiters', 'workday']
+const ATS_INFO: Record<string, { label: string; note: string }> = {
+  greenhouse: {
+    label: 'Greenhouse',
+    note:
+      'A clean, single hosted form. No account to create in most cases — you fill in your details, ' +
+      'attach a CV, answer a couple of questions and submit. A few minutes, start to finish.',
+  },
+  lever: {
+    label: 'Lever',
+    note:
+      'Much like Greenhouse: one page, resume upload, optional links, done quickly. It often offers ' +
+      'to parse your CV or a LinkedIn URL to save typing. No account needed to apply.',
+  },
+  ashby: {
+    label: 'Ashby',
+    note:
+      'The newest of the group and the fastest-feeling. A tidy single form, no account, and it ' +
+      'usually pre-fills cleanly from an uploaded CV. If you only have five minutes, this is the one.',
+  },
+  recruitee: {
+    label: 'Recruitee',
+    note:
+      'A light, short application — a few fields and an attachment. No account. Occasionally a ' +
+      'company adds screening questions, but the default is quick.',
+  },
+  smartrecruiters: {
+    label: 'SmartRecruiters',
+    note:
+      'Middle of the pack. Sometimes it lets you apply straight through, sometimes it asks you to ' +
+      'create a SmartRecruiters profile first. Budget ten minutes and expect a screening question or two.',
+  },
+  workday: {
+    label: 'Workday',
+    note:
+      'The slow one. It nearly always forces you to create an account, and it often makes you re-key ' +
+      'your CV into its own fields even after you upload the file. Set aside twenty to thirty minutes, ' +
+      'and save your login — a lot of larger companies use it, so you will meet it again.',
+  },
+}
+
+const present = ORDER.filter((a) => byAts.has(a))
+const description = guide.blurb
+---
+
+<ContentShell
+  title={`${guide.title} | ${SITE_NAME}`}
+  description={description}
+  path={guideUrl(guide.slug)}
+  h1={guide.h1}
+  lede={description}
+  crumbs={[{ name: 'Guides', href: '/guides/' }, { name: guide.nav, href: guideUrl(guide.slug) }]}
+  jsonLd={[articleLd(guide, Astro.site!, SITE_NAME)]}
+  narrow
+>
+  <p>
+    When you click apply on this site you leave for the company's own applicant tracking system —
+    the software it runs hiring on. Which one it is decides how long the application takes and
+    whether you have to create yet another account to submit it. That is worth knowing before you
+    click, because it lets you batch: save the slow ones for when you have time, and knock out the
+    quick ones in a lunch break. Of the {feeds.length} tracked startups with a readable feed, here
+    is what they use, quickest first.
+  </p>
+
+  {present.map((a) => {
+    const info = ATS_INFO[a]
+    const list = byAts
+      .get(a)!
+      .slice()
+      .sort((x, y) => y.jobs.length - x.jobs.length || x.name.localeCompare(y.name))
+    return (
+      <section style="margin-bottom:1.9em">
+        <h2 style="margin-bottom:.2em">{info.label}</h2>
+        <p class="small muted" style="margin:0 0 .5em">
+          {list.length} tracked {list.length === 1 ? 'company' : 'companies'} on this site
+        </p>
+        <p style="margin-top:0">{info.note}</p>
+        <p class="small">
+          Here:{' '}
+          {list.slice(0, 10).map((c, i) => (
+            <>
+              {i > 0 && ', '}
+              <a href={url.company(c.slug)}>{c.name}</a>
+              {c.jobs.length > 0 && <> ({c.jobs.length})</>}
+            </>
+          ))}
+          {list.length > 10 && <> and {list.length - 10} more</>}.
+        </p>
+      </section>
+    )
+  })}
+
+  {noFeed.length > 0 && (
+    <>
+      <h2>The ones with no readable feed</h2>
+      <p>
+        {noFeed.length} of the {s.companies} tracked companies publish nothing a machine can read
+        — their careers page is ordinary HTML, or their hiring tool has no public feed. They still
+        appear on this site with a link to that careers page, but the roles cannot be listed here,
+        so checking their own page is the only way to see what is open. Inventing listings for them
+        would make this site look fuller and be worth less.
+      </p>
+    </>
+  )}
+
+  <h2>Practical notes</h2>
+  <ul>
+    <li>Keep a plain-text copy of your CV to paste. Workday and, sometimes, SmartRecruiters will make you.</li>
+    <li>Do the quick ones — Greenhouse, Lever, Ashby, Recruitee — when you only have a few minutes; they are genuinely a few minutes.</li>
+    <li>Do Workday when you are at a desk with time, not on a phone between things.</li>
+    <li>The ATS is just the pipe. It does not tell you anything about the company or the role — a great team can be behind a clunky Workday form and a weak one behind a slick Ashby page.</li>
+  </ul>
+  <p class="small muted">
+    Application flows change as these tools update, so treat the descriptions above as the shape
+    of each one now, not a fixed rule. The company groupings are recomputed on every build from
+    the same feeds the rest of the site reads.
+  </p>
+
+  <h2 style="margin-top:2em">Other guides</h2>
+  <div class="grid">
+    {otherGuides(guide.slug).map((g) => (
+      <a class="tile" href={guideUrl(g.slug)}>
+        <h3>{g.nav}</h3>
+        <span class="meta">{g.blurb}</span>
+      </a>
+    ))}
+  </div>
+</ContentShell>

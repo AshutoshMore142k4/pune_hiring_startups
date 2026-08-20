@@ -9,12 +9,12 @@ const feeds = companies.filter((c) => c.ats)
 const byAts = [...new Set(feeds.map((c) => c.ats))].sort()
 
 const description =
-  'How Startup Radar collects Pune startup jobs: public ATS feeds only, refreshed every six ' +
+  'How Punehire collects Pune startup jobs: public ATS feeds only, refreshed every six ' +
   'hours, with the coverage limits stated plainly.'
 ---
 
 <ContentShell
-  title="How Startup Radar works — methodology and coverage"
+  title="How Punehire works — methodology and coverage"
   description={description}
   path={url.about()}
   h1="How this works"

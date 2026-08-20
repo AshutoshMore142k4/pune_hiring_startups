@@ -1,39 +1,46 @@
-name,slug,website,careers_url,ats,ats_slug,area,lat,lng,industry,stage,headcount_band
-Druva,druva,https://www.druva.com,https://www.druva.com/about/careers,greenhouse,druva,Hinjawadi,18.5913,73.7389,SaaS / Data Protection,late,1000+
-PubMatic,pubmatic,https://pubmatic.com,https://pubmatic.com/careers/,greenhouse,pubmatic,Baner,18.5642,73.7769,AdTech,public,1000+
-Mindtickle,mindtickle,https://www.mindtickle.com,https://www.mindtickle.com/careers/,lever,mindtickle,Baner,18.5642,73.7769,SaaS / Sales Enablement,late,500-1000
-Icertis,icertis,https://www.icertis.com,https://www.icertis.com/company/careers/,,,Hinjawadi,18.5913,73.7389,SaaS / Contract Lifecycle,late,1000+
-FirstCry,firstcry,https://www.firstcry.com,https://www.firstcry.com/careers,,,Magarpatta,18.5158,73.9280,E-commerce,public,1000+
-ElasticRun,elasticrun,https://www.elasticrun.in,https://www.elasticrun.in/careers,,,Baner,18.5642,73.7769,Logistics / B2B Commerce,late,1000+
-Vayana Network,vayana,https://www.vayana.com,https://www.vayana.com/careers,,,Baner,18.5642,73.7769,FinTech / Trade Finance,growth,200-500
-Zenduty,zenduty,https://zenduty.com,https://zenduty.com/careers,,,Baner,18.5642,73.7769,DevTools / Incident Response,seed,10-50
-Lentra,lentra,https://www.lentra.ai,https://www.lentra.ai/careers/,,,Kharadi,18.5515,73.9470,FinTech / Lending SaaS,growth,500-1000
-AgroStar,agrostar,https://agrostar.in,https://agrostar.in/careers,,,Baner,18.5642,73.7769,AgriTech,growth,500-1000
-Ecozen,ecozen,https://www.ecozensolutions.com,https://www.ecozensolutions.com/careers,,,Baner,18.5642,73.7769,ClimateTech / AgriTech,growth,200-500
-Repos Energy,repos-energy,https://www.reposenergy.com,https://www.reposenergy.com/careers,,,Kalyani Nagar,18.5480,73.9030,Energy / Mobility,growth,200-500
-FlytBase,flytbase,https://www.flytbase.com,https://www.flytbase.com/careers,,,Baner,18.5642,73.7769,Drone Autonomy,seed,50-200
-Loop Health,loop-health,https://www.loophealth.com,https://www.loophealth.com/careers,smartrecruiters,loophealth,Koregaon Park,18.5362,73.8939,HealthTech / Insurance,growth,200-500
-Quick Heal,quick-heal,https://www.quickheal.co.in,https://www.quickheal.co.in/careers,,,Shivajinagar,18.5308,73.8470,Cybersecurity,public,1000+
-eQ Technologic,eq-technologic,https://www.eqtechnologic.com,https://www.eqtechnologic.com/careers/,,,Baner,18.5642,73.7769,Enterprise Data Integration,late,200-500
-Sarvatra Technologies,sarvatra,https://www.sarvatra.in,https://www.sarvatra.in/careers,,,Shivajinagar,18.5308,73.8470,FinTech / Payments,growth,200-500
-Tekion,tekion,https://tekion.com,https://tekion.com/careers,ashby,tekion,Bavdhan,18.5150,73.7700,SaaS / Automotive Retail,late,1000+
-SEDEMAC Mechatronics,sedemac,https://www.sedemac.com,https://www.sedemac.com/careers,,,Talawade,18.6650,73.7800,DeepTech / Mechatronics,late,500-1000
-Tork Motors,tork-motors,https://www.torkmotors.com,https://www.torkmotors.com/careers,,,Chakan,18.7600,73.8600,Electric Vehicles,growth,200-500
-Kinetic Green,kinetic-green,https://kineticgreen.com,https://kineticgreen.com/careers,,,Chinchwad,18.6298,73.7997,Electric Vehicles,growth,500-1000
-Vayve Mobility,vayve,https://vayve.in,https://vayve.in/careers,,,Hinjawadi,18.5913,73.7389,Electric Vehicles,seed,50-200
-Rebel Foods,rebel-foods,https://www.rebelfoods.com,https://www.rebelfoods.com/careers,smartrecruiters,rebelfoods,Kalyani Nagar,18.5480,73.9030,Food Tech,late,1000+
-Peppermint Robotics,peppermint,https://peppermintrobots.com,https://peppermintrobots.com/careers,,,Hinjawadi,18.5913,73.7389,Robotics,seed,50-200
-Mylab Discovery Solutions,mylab,https://www.mylabglobal.com,https://www.mylabglobal.com/careers,,,Lohegaon,18.5800,73.9800,Diagnostics / BioTech,growth,200-500
-Gennova Biopharmaceuticals,gennova,https://www.gennova.bio,https://www.gennova.bio/careers,,,Hinjawadi,18.5913,73.7389,BioTech,growth,500-1000
-Sagar Defence Engineering,sagar-defence,https://sagardefence.com,https://sagardefence.com/careers,,,Pimpri,18.6298,73.7997,DefenceTech / Marine Robotics,seed,50-200
-Amura Marketing,amura,https://www.amuratech.com,https://www.amuratech.com/careers,,,Baner,18.5642,73.7769,MarTech,growth,200-500
-Nexzu Mobility,nexzu,https://nexzumobility.com,https://nexzumobility.com/careers,,,Pimpri,18.6298,73.7997,Electric Vehicles,growth,50-200
-Sun Mobility,sun-mobility,https://www.sunmobility.co.in,https://www.sunmobility.co.in/careers,,,Chakan,18.7600,73.8600,Energy / EV Infrastructure,growth,200-500
-BrowserStack,browserstack,https://www.browserstack.com,https://www.browserstack.com/careers,workday,browserstack.wd3.myworkdayjobs.com/External,Kharadi,18.5515,73.9470,DevTools,late,1000+
-Nutanix,nutanix,https://www.nutanix.com,https://www.nutanix.com/company/careers,,,Hinjawadi,18.5913,73.7389,Cloud Infrastructure,public,1000+
-Cohesity,cohesity,https://www.cohesity.com,https://www.cohesity.com/company/careers/,,,Baner,18.5642,73.7769,Data Management,late,1000+
-Rubrik,rubrik,https://www.rubrik.com,https://www.rubrik.com/company/careers,greenhouse,rubrik,Hinjawadi,18.5913,73.7389,Data Security,public,1000+
-Zscaler,zscaler,https://www.zscaler.com,https://www.zscaler.com/careers,greenhouse,zscaler,Hinjawadi,18.5913,73.7389,Cybersecurity,public,1000+
-Veeva Systems,veeva,https://www.veeva.com,https://careers.veeva.com,,,Kharadi,18.5515,73.9470,Life Sciences SaaS,public,1000+
-Blue Yonder,blue-yonder,https://blueyonder.com,https://blueyonder.com/careers,,,Hinjawadi,18.5913,73.7389,Supply Chain SaaS,late,1000+
-Emerson Automation,emerson,https://www.emerson.com,https://hr.emerson.com/en-us/careers,,,Hinjawadi,18.5913,73.7389,Industrial Automation,public,1000+
+name,slug,website,careers_url,ats,ats_slug,area,lat,lng,industry,stage,headcount_band,kind
+Druva,druva,https://www.druva.com,https://www.druva.com/about/careers,greenhouse,druva,Hinjawadi,18.5913,73.7389,SaaS / Data Protection,late,1000+,startup
+PubMatic,pubmatic,https://pubmatic.com,https://pubmatic.com/careers/,greenhouse,pubmatic,Baner,18.5642,73.7769,AdTech,public,1000+,startup
+Mindtickle,mindtickle,https://www.mindtickle.com,https://www.mindtickle.com/careers/,lever,mindtickle,Baner,18.5642,73.7769,SaaS / Sales Enablement,late,500-1000,startup
+Icertis,icertis,https://www.icertis.com,https://www.icertis.com/company/careers/,,,Hinjawadi,18.5913,73.7389,SaaS / Contract Lifecycle,late,1000+,startup
+FirstCry,firstcry,https://www.firstcry.com,https://www.firstcry.com/careers,,,Magarpatta,18.5158,73.9280,E-commerce,public,1000+,startup
+ElasticRun,elasticrun,https://www.elasticrun.in,https://www.elasticrun.in/careers,,,Baner,18.5642,73.7769,Logistics / B2B Commerce,late,1000+,startup
+Vayana Network,vayana,https://www.vayana.com,https://www.vayana.com/careers,,,Baner,18.5642,73.7769,FinTech / Trade Finance,growth,200-500,startup
+Zenduty,zenduty,https://zenduty.com,https://zenduty.com/careers,,,Baner,18.5642,73.7769,DevTools / Incident Response,seed,10-50,startup
+Lentra,lentra,https://www.lentra.ai,https://www.lentra.ai/careers/,,,Kharadi,18.5515,73.9470,FinTech / Lending SaaS,growth,500-1000,startup
+AgroStar,agrostar,https://agrostar.in,https://agrostar.in/careers,,,Baner,18.5642,73.7769,AgriTech,growth,500-1000,startup
+Ecozen,ecozen,https://www.ecozensolutions.com,https://www.ecozensolutions.com/careers,,,Baner,18.5642,73.7769,ClimateTech / AgriTech,growth,200-500,startup
+Repos Energy,repos-energy,https://www.reposenergy.com,https://www.reposenergy.com/careers,,,Kalyani Nagar,18.5480,73.9030,Energy / Mobility,growth,200-500,startup
+FlytBase,flytbase,https://www.flytbase.com,https://www.flytbase.com/careers,,,Baner,18.5642,73.7769,Drone Autonomy,seed,50-200,startup
+Loop Health,loop-health,https://www.loophealth.com,https://www.loophealth.com/careers,smartrecruiters,loophealth,Koregaon Park,18.5362,73.8939,HealthTech / Insurance,growth,200-500,startup
+Quick Heal,quick-heal,https://www.quickheal.co.in,https://www.quickheal.co.in/careers,,,Shivajinagar,18.5308,73.8470,Cybersecurity,public,1000+,startup
+eQ Technologic,eq-technologic,https://www.eqtechnologic.com,https://www.eqtechnologic.com/careers/,,,Baner,18.5642,73.7769,Enterprise Data Integration,late,200-500,startup
+Sarvatra Technologies,sarvatra,https://www.sarvatra.in,https://www.sarvatra.in/careers,,,Shivajinagar,18.5308,73.8470,FinTech / Payments,growth,200-500,startup
+Tekion,tekion,https://tekion.com,https://tekion.com/careers,ashby,tekion,Bavdhan,18.5150,73.7700,SaaS / Automotive Retail,late,1000+,startup
+SEDEMAC Mechatronics,sedemac,https://www.sedemac.com,https://www.sedemac.com/careers,,,Talawade,18.6650,73.7800,DeepTech / Mechatronics,late,500-1000,startup
+Tork Motors,tork-motors,https://www.torkmotors.com,https://www.torkmotors.com/careers,,,Chakan,18.7600,73.8600,Electric Vehicles,growth,200-500,startup
+Kinetic Green,kinetic-green,https://kineticgreen.com,https://kineticgreen.com/careers,,,Chinchwad,18.6298,73.7997,Electric Vehicles,growth,500-1000,startup
+Vayve Mobility,vayve,https://vayve.in,https://vayve.in/careers,,,Hinjawadi,18.5913,73.7389,Electric Vehicles,seed,50-200,startup
+Rebel Foods,rebel-foods,https://www.rebelfoods.com,https://www.rebelfoods.com/careers,smartrecruiters,rebelfoods,Kalyani Nagar,18.5480,73.9030,Food Tech,late,1000+,startup
+Peppermint Robotics,peppermint,https://peppermintrobots.com,https://peppermintrobots.com/careers,,,Hinjawadi,18.5913,73.7389,Robotics,seed,50-200,startup
+Mylab Discovery Solutions,mylab,https://www.mylabglobal.com,https://www.mylabglobal.com/careers,,,Lohegaon,18.5800,73.9800,Diagnostics / BioTech,growth,200-500,startup
+Gennova Biopharmaceuticals,gennova,https://www.gennova.bio,https://www.gennova.bio/careers,,,Hinjawadi,18.5913,73.7389,BioTech,growth,500-1000,startup
+Sagar Defence Engineering,sagar-defence,https://sagardefence.com,https://sagardefence.com/careers,,,Pimpri,18.6298,73.7997,DefenceTech / Marine Robotics,seed,50-200,startup
+Amura Marketing,amura,https://www.amuratech.com,https://www.amuratech.com/careers,,,Baner,18.5642,73.7769,MarTech,growth,200-500,startup
+Nexzu Mobility,nexzu,https://nexzumobility.com,https://nexzumobility.com/careers,,,Pimpri,18.6298,73.7997,Electric Vehicles,growth,50-200,startup
+Sun Mobility,sun-mobility,https://www.sunmobility.co.in,https://www.sunmobility.co.in/careers,,,Chakan,18.7600,73.8600,Energy / EV Infrastructure,growth,200-500,startup
+BrowserStack,browserstack,https://www.browserstack.com,https://www.browserstack.com/careers,workday,browserstack.wd3.myworkdayjobs.com/External,Kharadi,18.5515,73.9470,DevTools,late,1000+,startup
+Nutanix,nutanix,https://www.nutanix.com,https://www.nutanix.com/company/careers,,,Hinjawadi,18.5913,73.7389,Cloud Infrastructure,public,1000+,startup
+Cohesity,cohesity,https://www.cohesity.com,https://www.cohesity.com/company/careers/,,,Baner,18.5642,73.7769,Data Management,late,1000+,startup
+Rubrik,rubrik,https://www.rubrik.com,https://www.rubrik.com/company/careers,greenhouse,rubrik,Hinjawadi,18.5913,73.7389,Data Security,public,1000+,startup
+Zscaler,zscaler,https://www.zscaler.com,https://www.zscaler.com/careers,greenhouse,zscaler,Hinjawadi,18.5913,73.7389,Cybersecurity,public,1000+,startup
+Veeva Systems,veeva,https://www.veeva.com,https://careers.veeva.com,,,Kharadi,18.5515,73.9470,Life Sciences SaaS,public,1000+,startup
+Blue Yonder,blue-yonder,https://blueyonder.com,https://blueyonder.com/careers,,,Hinjawadi,18.5913,73.7389,Supply Chain SaaS,late,1000+,startup
+Emerson Automation,emerson,https://www.emerson.com,https://hr.emerson.com/en-us/careers,,,Hinjawadi,18.5913,73.7389,Industrial Automation,public,1000+,startup
+Barclays,barclays,https://home.barclays,https://search.jobs.barclays/,,,Hinjawadi,18.5913,73.7389,Banking / Financial Services,public,1000+,enterprise
+JP Morgan,jp-morgan,https://www.jpmorganchase.com,https://careers.jpmorgan.com/,,,Kharadi,18.5515,73.9470,Banking / Financial Services,public,1000+,enterprise
+Cognizant,cognizant,https://www.cognizant.com,https://careers.cognizant.com/global/en,,,Hinjawadi,18.5913,73.7389,IT Services,public,1000+,enterprise
+Accenture,accenture,https://www.accenture.com,https://www.accenture.com/in-en/careers,,,Hinjawadi,18.5913,73.7389,IT Services / Consulting,public,1000+,enterprise
+Capgemini,capgemini,https://www.capgemini.com,https://www.capgemini.com/careers/,,,Talawade,18.6650,73.7800,IT Services,public,1000+,enterprise
+Tech Mahindra,tech-mahindra,https://www.techmahindra.com,https://careers.techmahindra.com/,,,Hinjawadi,18.5913,73.7389,IT Services,public,1000+,enterprise
+Infosys,infosys,https://www.infosys.com,https://www.infosys.com/careers.html,,,Hinjawadi,18.5913,73.7389,IT Services,public,1000+,enterprise

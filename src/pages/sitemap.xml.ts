@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro'
-import { allJobs, areas, loadAll, stats } from '../data/load'
+import { areas, loadEvery, everyJob, stats } from '../data/load'
 import { jobSlug, url as u, slugify } from '../data/slugs'
+import { GUIDES, guideUrl } from '../data/guides'
 import { FUNCTIONS } from '@/lib/filters'
 
 /**
@@ -17,8 +18,10 @@ const esc = (s: string) =>
 const day = (iso?: string | null) => (iso ? new Date(iso).toISOString() : undefined)
 
 export const GET: APIRoute = async ({ site }) => {
-  const companies = await loadAll()
-  const jobs = await allJobs()
+  // loadEvery / everyJob: the sitemap covers both startups and enterprises so every generated
+  // company and job page is listed. The startup-only aggregate pages are added explicitly below.
+  const companies = await loadEvery()
+  const jobs = await everyJob()
   const grouped = await areas()
   const s = await stats()
 
@@ -30,7 +33,21 @@ export const GET: APIRoute = async ({ site }) => {
     { path: '/roles/', lastmod: s.updated, changefreq: 'daily', priority: '0.7' },
     { path: '/fresher-jobs-in-pune/', lastmod: s.updated, changefreq: 'daily', priority: '0.8' },
     { path: '/internships-in-pune/', lastmod: s.updated, changefreq: 'daily', priority: '0.8' },
+    { path: u.enterprises(), lastmod: s.updated, changefreq: 'daily', priority: '0.7' },
     { path: u.about(), changefreq: 'monthly', priority: '0.3' },
+    { path: '/guides/', lastmod: s.updated, changefreq: 'weekly', priority: '0.5' },
+    { path: '/privacy/', changefreq: 'monthly', priority: '0.2' },
+    { path: '/terms/', changefreq: 'monthly', priority: '0.2' },
+    { path: '/disclaimer/', changefreq: 'monthly', priority: '0.2' },
+    { path: '/contact/', changefreq: 'monthly', priority: '0.2' },
+
+    // Guides recompute their live figures on every build, so lastmod tracks the last crawl.
+    ...GUIDES.map((g) => ({
+      path: guideUrl(g.slug),
+      lastmod: s.updated,
+      changefreq: 'weekly',
+      priority: '0.5',
+    })),
 
     ...companies.map((c) => ({
       path: u.company(c.slug),

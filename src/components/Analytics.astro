@@ -1,0 +1,44 @@
+---
+/**
+ * Two analytics channels, both optional, both independent, neither on by default.
+ *
+ * Optional because this site ships finished HTML: with no env var set, this component renders
+ * literally nothing and the pages carry no third-party request at all. That is the honest
+ * default for a site whose whole pitch is that it does not collect anything from you.
+ *
+ * PUBLIC_GA_ID (GA4, G-XXXXXXXXXX)
+ *   Sets cookies. Only worth turning on if you actually need UTM attribution or events —
+ *   the moment it is set, the privacy policy's cookie disclosures have to be true.
+ *
+ * PUBLIC_CF_BEACON (Cloudflare Web Analytics token)
+ *   Cookieless, so no consent banner. On Cloudflare Pages you normally do NOT need this:
+ *   enabling Web Analytics in the dashboard injects the beacon at deploy time by itself, and
+ *   a second beacon on the page is ignored. Set it only when hosting somewhere else.
+ *   Undercounts — ad blockers and Brave shields block the beacon.
+ */
+const ga = import.meta.env.PUBLIC_GA_ID
+const cf = import.meta.env.PUBLIC_CF_BEACON
+---
+
+{
+  ga && (
+    <>
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${ga}`} />
+      <script
+        is:inline
+        set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config',${JSON.stringify(ga)});`}
+      />
+    </>
+  )
+}
+
+{
+  cf && (
+    <script
+      is:inline
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon={JSON.stringify({ token: cf })}
+    />
+  )
+}

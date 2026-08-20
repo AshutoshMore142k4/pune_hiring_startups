@@ -1,0 +1,248 @@
+---
+import ContentShell from '../../layouts/ContentShell.astro'
+import { areas, stats } from '../../data/load'
+import { SITE_NAME } from '../../data/seo'
+import { url } from '../../data/slugs'
+import { GUIDES, articleLd, guideUrl, otherGuides } from '../../data/guides'
+
+const guide = GUIDES.find((g) => g.slug === 'where-pune-startup-jobs-are')!
+
+const grouped = await areas()
+const s = await stats()
+
+const ranked = grouped
+  .map((a) => ({
+    name: a.name,
+    companies: a.companies,
+    open: a.companies.reduce((n, c) => n + c.jobs.length, 0),
+    hiring: a.companies.filter((c) => c.jobs.length > 0),
+  }))
+  .sort((a, b) => b.open - a.open || b.companies.length - a.companies.length)
+
+const active = ranked.filter((a) => a.open > 0)
+const quiet = ranked.filter((a) => a.open === 0)
+const top = active[0]
+
+/**
+ * Hand-written, one per area, keyed by the exact `area` string in the company table. An area
+ * with no note still renders its live counts — better an incomplete entry than an invented one.
+ */
+const NOTES: Record<string, string> = {
+  Hinjawadi:
+    'Rajiv Gandhi Infotech Park, on the far western edge and technically outside the city limits, in ' +
+    'Mulshi taluka. Three phases laid end to end, holding the largest campuses in Pune. Almost ' +
+    'nothing small sits here — a fifteen-person startup does not take space in Hinjawadi, so the ' +
+    'roles are mostly at scale-ups and the India offices of foreign companies. The structural ' +
+    'problem is access: nearly all of it enters through the Wakad junction off the Mumbai–Bengaluru ' +
+    'highway, so one short stretch of road decides the length of everyone’s commute. People who ' +
+    'work here live in Wakad, Baner, Balewadi, Punawale or Pimple Saudagar and treat the east of the ' +
+    'city as another town.',
+  Baner:
+    'The corridor between the highway and the older west side, running into Balewadi and Pashan. ' +
+    'Offices are floors in commercial buildings rather than campuses, which is why mid-size SaaS and ' +
+    'product companies cluster here instead of in Hinjawadi. Its real advantage is that it is also a ' +
+    'place people live, so a Baner job is often a ten-minute commute. Baner Road itself jams at both ' +
+    'peaks and there is no way around that.',
+  Balewadi:
+    'Next to Baner and functionally part of the same corridor, with newer commercial stock around the ' +
+    'stadium and the high street. Same commute profile as Baner, slightly closer to the highway.',
+  Wakad:
+    'The junction everything else passes through, so it is more a residential base for Hinjawadi than ' +
+    'an office district of its own. Living here buys the shortest possible commute west, at the cost ' +
+    'of sitting in the middle of the traffic.',
+  Aundh:
+    'Older, established, west-central, between Baner and the university. Small offices above retail ' +
+    'rather than IT parks. Well placed for anyone who wants to avoid both Hinjawadi and the east.',
+  Kharadi:
+    'The east-side counterpart to Hinjawadi — EON IT Park and the towers around it, off Nagar Road. ' +
+    'Newer, denser and still under construction in places. It draws its workforce from Wagholi, Viman ' +
+    'Nagar, Kalyani Nagar and Chandan Nagar. Kharadi is not on the metro; the nearest station is at ' +
+    'the Ramwadi end of the Vanaz–Ramwadi line and the rest of the trip is road.',
+  Magarpatta:
+    'A planned township in the south-east where the offices, flats and shops were built as one project, ' +
+    'with SP Infocity next door in Hadapsar. That layout is the whole point: a lot of people who work ' +
+    'in Magarpatta also live inside it and walk to the office. From anywhere else it is a long trip, ' +
+    'because the approaches through Hadapsar carry the entire eastern corridor.',
+  Hadapsar:
+    'The south-eastern industrial and office belt around Magarpatta, older and more mixed. Reachable ' +
+    'from Kondhwa, Undri and NIBM without crossing the centre, which is the main reason to want it.',
+  'Viman Nagar':
+    'Nagar Road, beside the airport at Lohegaon, with offices, retail and a large residential base on ' +
+    'the same few streets. Sensible if the job involves flying often and workable for the eastern belt ' +
+    'generally. From the west it is one of the worst commutes in the city.',
+  'Kalyani Nagar':
+    'Central-east, across the river from Koregaon Park, and one of the few office areas with its own ' +
+    'metro station on the Vanaz–Ramwadi line. Offices are floors, not campuses, so companies here ' +
+    'are usually early-stage or deliberately compact.',
+  'Koregaon Park':
+    'Old, central and expensive, and not primarily an office district. Companies that choose it are ' +
+    'generally small and choosing it deliberately: it is one of the few addresses reachable from both ' +
+    'halves of the city without crossing the entire width of it.',
+  Shivajinagar:
+    'The administrative centre, and the eastern end of the metro line being built out to Hinjawadi. ' +
+    'Office stock is older. Being genuinely central, it is the rare Pune workplace with a tolerable ' +
+    'commute from most directions.',
+  Yerawada:
+    'Between the centre and Nagar Road, with a metro station and some large office buildings. Close ' +
+    'enough to the airport and Koregaon Park to be convenient, far enough from the IT parks to be quiet.',
+  Bavdhan:
+    'The western fringe past Kothrud, on the way to the Mumbai expressway. Mostly residential with ' +
+    'some office space, and a short hop to both Hinjawadi and Baner without sitting inside either ' +
+    'one’s traffic.',
+  Pimpri:
+    'PCMC — the industrial half of the metropolitan area to the north-west, with its own municipal ' +
+    'corporation and a manufacturing base far older than the IT side. Companies here lean engineering ' +
+    'and industrial rather than software. The PCMC–Swargate metro line runs through it, which makes ' +
+    'it one of the better-connected places to work.',
+  Chinchwad:
+    'Next to Pimpri and the same story: engineering, auto components and industrial firms rather than ' +
+    'software floors, with metro access along the old Pune–Mumbai road.',
+  Chakan:
+    'The automotive belt roughly 30 km north on the Nashik highway. Not a software address. Roles here ' +
+    'are plant, supply chain and industrial engineering, and they effectively require living in the ' +
+    'northern belt — commuting to Chakan from the west of the city is not a realistic daily plan.',
+  Talawade:
+    'An IT park in the PCMC belt, next to the industrial areas in the north-west. Cheaper and quieter ' +
+    'than Hinjawadi, and much less served by anything around it.',
+  Lohegaon:
+    'North-east, around the airport. Mixed industrial and residential, and the workplaces here are ' +
+    'usually attached to something physical rather than a software floor.',
+}
+
+const description = guide.blurb
+---
+
+<ContentShell
+  title={`${guide.title} | ${SITE_NAME}`}
+  description={description}
+  path={guideUrl(guide.slug)}
+  h1={guide.h1}
+  lede={description}
+  crumbs={[{ name: 'Guides', href: '/guides/' }, { name: guide.nav, href: guideUrl(guide.slug) }]}
+  jsonLd={[articleLd(guide, Astro.site!, SITE_NAME)]}
+  narrow
+>
+  <p>
+    Pune is not one job market. It is two office belts on opposite sides of a city that is hard
+    to cross, plus an industrial belt to the north-west that runs on a different calendar
+    entirely. Which side you take a job on decides more about your day than the job title does,
+    because moving between them at nine in the morning is a project.
+  </p>
+  <p>
+    Of the {s.jobs} roles open on this site right now, spread across {s.companies} tracked
+    companies, {active.length === 0
+      ? 'none currently carry an area'
+      : (
+        <>
+          {top!.open} sit in <a href={url.area(top!.name)}>{top!.name}</a> alone
+        </>
+      )}. That balance shifts every crawl, so the counts below are recomputed each time the site
+    is built rather than written down once.
+  </p>
+
+  <h2>The areas, ranked by what is open today</h2>
+
+  {active.map((a) => (
+    <section style="margin-bottom:1.9em">
+      <h3 id={a.name.toLowerCase().replace(/\s+/g, '-')} style="margin-bottom:.2em">
+        <a href={url.area(a.name)}>{a.name}</a>
+      </h3>
+      <p class="small muted" style="margin:0 0 .6em">
+        {a.open} open {a.open === 1 ? 'role' : 'roles'} · {a.hiring.length} of{' '}
+        {a.companies.length} tracked {a.companies.length === 1 ? 'company' : 'companies'} hiring
+      </p>
+      {NOTES[a.name] && <p style="margin-top:0">{NOTES[a.name]}</p>}
+      <p class="small">
+        Hiring here now:{' '}
+        {a.hiring.slice(0, 6).map((c, i) => (
+          <>
+            {i > 0 && ', '}
+            <a href={url.company(c.slug)}>{c.name}</a> ({c.jobs.length})
+          </>
+        ))}
+        {a.hiring.length > 6 && <> and {a.hiring.length - 6} more</>}.
+      </p>
+    </section>
+  ))}
+
+  {quiet.length > 0 && (
+    <>
+      <h2>Quiet right now</h2>
+      <p>
+        These areas have companies on this site but nothing open in their feeds today. That is
+        usually a lull rather than a closure, and several of them are the kind of place that
+        posts two roles at once and then nothing for a quarter.
+      </p>
+      {quiet.map((a) => (
+        <section style="margin-bottom:1.4em">
+          <h3 style="margin-bottom:.2em">
+            <a href={url.area(a.name)}>{a.name}</a>
+          </h3>
+          <p class="small muted" style="margin:0 0 .5em">
+            {a.companies.length} tracked {a.companies.length === 1 ? 'company' : 'companies'} ·
+            no open roles in the feed
+          </p>
+          {NOTES[a.name] && <p class="small" style="margin-top:0">{NOTES[a.name]}</p>}
+        </section>
+      ))}
+    </>
+  )}
+
+  <h2>The commute rule that matters more than any other</h2>
+  <p>
+    Do not take a job on the far side of the city from where you live and assume you will
+    manage. Hinjawadi to Kharadi is about 25 km on a map and considerably worse than that
+    suggests in practice, because the route goes through the middle of Pune rather than around
+    it. There is no ring road that helps and no rail link between the two belts. People who try
+    it either move house within three months or stop turning up in the office.
+  </p>
+  <p>
+    Two metro lines are running — PCMC to Swargate, and Vanaz to Ramwadi — and between them they
+    serve the PCMC belt, the centre, Yerawada and Kalyani Nagar. Neither reaches Hinjawadi,
+    Kharadi or Magarpatta. A third line between Hinjawadi and Shivajinagar has been under
+    construction for years and its opening date has moved more than once; check where it
+    actually stands before planning anything around it.
+  </p>
+  <p>
+    The practical version: pick the belt first, then the company. If you already live in Wakad,
+    Baner or Pimple Saudagar, treat <a href={url.area('Hinjawadi')}>Hinjawadi</a> and{' '}
+    <a href={url.area('Baner')}>Baner</a> as your market. If you live in Wagholi, Viman Nagar or
+    Kalyani Nagar, the east belt is yours. Applying to both halves at once is fine — accepting
+    from the wrong half is what goes badly.
+  </p>
+
+  <h2>What "area" means on this site, exactly</h2>
+  <p>
+    Each company carries one area: the office this site associates with it, maintained by hand.
+    It is not per-role. A company filed under Baner may have a team sitting somewhere else, and
+    a job posting that says only "Pune" gives no better information than that. Where the posting
+    names something more specific, it appears on the job page in the location field, unedited.
+  </p>
+  <p>
+    Map pins are placed at neighbourhood centroids, not street addresses, and nudged apart so
+    overlapping companies stay visible. Treat them as "roughly here", never as directions. The
+    full method is in <a href="/about/">how this works</a>.
+  </p>
+  <p>
+    One more limit worth stating: this is not a census of Pune. It is {s.companies} companies
+    that were chosen by hand and that publish a machine-readable feed or a careers page. Areas
+    dominated by companies that publish neither will look emptier here than they are.
+  </p>
+
+  <h2>Keep going</h2>
+  <p>
+    Browse <a href="/areas/">every area</a>, the{' '}
+    <a href="/companies/">full company list</a>, or{' '}
+    <a href="/jobs/latest/">the newest roles across all of them</a>.
+  </p>
+
+  <h2 style="margin-top:2em">Other guides</h2>
+  <div class="grid">
+    {otherGuides(guide.slug).map((g) => (
+      <a class="tile" href={guideUrl(g.slug)}>
+        <h3>{g.nav}</h3>
+        <span class="meta">{g.blurb}</span>
+      </a>
+    ))}
+  </div>
+</ContentShell>

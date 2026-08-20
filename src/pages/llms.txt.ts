@@ -8,7 +8,7 @@ export const GET: APIRoute = async ({ site }) => {
   const grouped = await areas()
   const abs = (p: string) => new URL(p, site).href
 
-  const body = `# Startup Radar
+  const body = `# Punehire
 
 > A live map of which startups in Pune, India are hiring right now. ${s.jobs} open roles
 > across ${s.hiring} of ${s.companies} tracked startups, read directly from each company's

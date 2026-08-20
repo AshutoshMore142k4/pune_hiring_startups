@@ -42,4 +42,5 @@ export const url = {
   area: (area: string) => `/areas/${areaSlug(area)}/`,
   role: (tag: string) => `/roles/${slugify(tag)}/`,
   about: () => '/about/',
+  enterprises: () => '/pune-it-companies-hiring/',
 }

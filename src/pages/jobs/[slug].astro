@@ -1,14 +1,15 @@
 ---
 import ContentShell from '../../layouts/ContentShell.astro'
-import { allJobs, type JobWithCompany } from '../../data/load'
+import { everyJob, type JobWithCompany } from '../../data/load'
 import { jobPostingLd } from '../../data/seo'
 import { jobSlug, url } from '../../data/slugs'
 import { jobFunctions, timeAgo } from '@/lib/filters'
 
 export async function getStaticPaths() {
   // Only open roles get a page. Google is explicit that an expired listing must not stay
-  // reachable carrying JobPosting schema, and loadAll() already filters to is_open.
-  const jobs = await allJobs()
+  // reachable carrying JobPosting schema, and loadEvery() already filters to is_open.
+  // everyJob, not allJobs: enterprise roles share this route and each needs its own page.
+  const jobs = await everyJob()
   return jobs.map((job) => ({
     params: { slug: jobSlug(job.company.slug, job.title, job.ats_job_id) },
     props: { job },
@@ -17,9 +18,11 @@ export async function getStaticPaths() {
 
 const { job } = Astro.props as { job: JobWithCompany }
 const company = job.company
+const isEnterprise = company.kind === 'enterprise'
 const slug = jobSlug(company.slug, job.title, job.ats_job_id)
 
-const everything = await allJobs()
+// Related roles come from the same section, so an enterprise role links to other enterprise roles.
+const everything = (await everyJob()).filter((j) => j.company.kind === company.kind)
 const sameCompany = everything
   .filter((j) => j.company.slug === company.slug && j.ats_job_id !== job.ats_job_id)
   .slice(0, 6)
@@ -52,7 +55,7 @@ const experience =
         : `${job.experience_min}–${job.experience_max} years`
 
 const where = [job.location_raw, company.area].filter(Boolean)[0] ?? 'Pune'
-const title = `${job.title} at ${company.name} — ${where} | Startup Radar`
+const title = `${job.title} at ${company.name} — ${where} | Punehire`
 const description = (
   job.description?.replace(/\s+/g, ' ').slice(0, 155) ??
   `${job.title} at ${company.name} in ${where}. Open role at a Pune startup.`
@@ -60,7 +63,9 @@ const description = (
 
 const jsonLd = [jobPostingLd(job, company, Astro.site!, slug)]
 const crumbs = [
-  { name: 'Jobs', href: url.jobs() },
+  isEnterprise
+    ? { name: 'IT companies', href: url.enterprises() }
+    : { name: 'Jobs', href: url.jobs() },
   { name: company.name, href: url.company(company.slug) },
   { name: job.title, href: url.job(slug) },
 ]

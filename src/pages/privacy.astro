@@ -1,0 +1,194 @@
+---
+import ContentShell from '../layouts/ContentShell.astro'
+import { url } from '../data/slugs'
+
+/** Plain constant, not a build date — this page should only change when the policy does. */
+const UPDATED = '19 August 2026'
+const CONTACT = import.meta.env.PUBLIC_CONTACT_EMAIL ?? 'hello@punehire.com'
+
+// Read at build time so the page states what this build actually ships, not an intention.
+const adsOn = Boolean(import.meta.env.PUBLIC_ADSENSE_CLIENT)
+const gaOn = Boolean(import.meta.env.PUBLIC_GA_ID)
+const cfOn = Boolean(import.meta.env.PUBLIC_CF_BEACON)
+
+const description =
+  'What Punehire stores, what it does not, and how Google advertising and analytics ' +
+  'cookies work here. Written for this site, not copied from a template.'
+---
+
+<ContentShell
+  title="Privacy policy | Punehire"
+  description={description}
+  path="/privacy/"
+  h1="Privacy policy"
+  lede="This site is static HTML. It has no accounts, no login, no forms and no database of visitors. What follows is a description of the few things that do happen."
+  crumbs={[{ name: 'Privacy', href: '/privacy/' }]}
+  narrow
+>
+  <p class="small muted">Last updated {UPDATED}.</p>
+
+  <h2>The short version</h2>
+  <ul>
+    <li>Punehire does not ask you for any personal information, and has nowhere to put it if you gave it.</li>
+    <li>One thing is stored in your browser: your light or dark theme choice.</li>
+    <li>The map on the front page loads tiles from CARTO, which sees your IP address.</li>
+    <li>Google advertising and analytics cookies are covered in detail below.</li>
+    <li>Applications happen on the employer's own site. We never see one.</li>
+  </ul>
+
+  <h2>What this site is, technically</h2>
+  <p>
+    Every page here was generated ahead of time and is served as a finished file from
+    Cloudflare Pages. There is no application server, no session, no user account and no
+    visitor database. Nothing you do while reading this site is written to anything we
+    control.
+  </p>
+  <p>
+    The one exception is email. If you write to us, your message and your address sit in a
+    mailbox, like any other correspondence.
+  </p>
+
+  <h2>What is stored in your browser</h2>
+  <p>
+    One item, in <code>localStorage</code>, under the key <code>theme</code>. Its value is
+    either <code>light</code> or <code>dark</code>, and it exists so the site does not flash
+    the wrong colour scheme on your next visit. It is not a cookie, it is never sent to any
+    server, and clearing site data in your browser removes it.
+  </p>
+  <p>
+    Punehire sets no cookies of its own. The cookies described further down are set by
+    Google, not by us, and only once advertising or analytics is switched on.
+  </p>
+
+  <h2>Requests that leave this site</h2>
+  <p>
+    A static page can still make your browser talk to someone else. That happens in three
+    ways here, and any third party your browser contacts necessarily sees your IP address,
+    your user agent, and which page referred you.
+  </p>
+  <ul>
+    <li>
+      <strong>Map tiles.</strong> The map on the front page loads image tiles from CARTO's
+      basemap service, drawn from OpenStreetMap data. Every page also opens a connection to
+      that host in advance so the map draws quickly. See
+      <a href="https://carto.com/privacy/" rel="noopener">CARTO's privacy notice</a> and the
+      <a href="https://wiki.osmfoundation.org/wiki/Privacy_Policy" rel="noopener">OpenStreetMap Foundation privacy policy</a>.
+    </li>
+    <li>
+      <strong>Hosting.</strong> Cloudflare serves this site and, like any web host, processes
+      request data including IP addresses to deliver pages and block abuse. See
+      <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare's privacy policy</a>.
+    </li>
+    <li>
+      <strong>Outbound links.</strong> Apply buttons go straight to the employer's applicant
+      tracking system. There is no redirect through us and no click tracking. Once you land
+      there, that company's privacy policy applies and this one stops being relevant.
+    </li>
+  </ul>
+
+  <h2>Analytics</h2>
+  <p>
+    This site is built to run with either Google Analytics 4, which sets cookies and records
+    page views with an approximate location derived from your IP address, or Cloudflare Web
+    Analytics, which sets no cookies and identifies nobody. Whichever is enabled is used to
+    count pages and referrers. It is not used to build a profile of you, and no analytics
+    data is sold or passed to anyone else.
+  </p>
+
+  <h2>Advertising</h2>
+  <p>
+    This site is intended to be funded by advertising through Google AdSense. The disclosures
+    below apply whenever those ads are running.
+  </p>
+  <ul>
+    <li>
+      Third-party vendors, including Google, use cookies to serve ads based on your prior
+      visits to this website or to other websites.
+    </li>
+    <li>
+      Google's use of advertising cookies enables it and its partners to serve ads to you
+      based on your visit to this site and/or other sites on the internet.
+    </li>
+    <li>
+      You may opt out of personalised advertising by visiting
+      <a href="https://www.google.com/settings/ads" rel="noopener">Google Ads Settings</a>.
+      You can also opt out of some third-party vendors' use of cookies for personalised
+      advertising at <a href="https://www.aboutads.info/choices/" rel="noopener">aboutads.info/choices</a>.
+    </li>
+    <li>
+      Google AdSense is the only advertising network serving ads on this site. There are no
+      other ad partners, no affiliate links and no paid listings. If that ever changes, this
+      page changes first.
+    </li>
+  </ul>
+  <p>
+    How Google uses cookies in advertising is set out in
+    <a href="https://policies.google.com/technologies/ads" rel="noopener">Google's advertising technologies notice</a>,
+    and how Google handles data from sites that use its products is set out in
+    <a href="https://policies.google.com/technologies/partner-sites" rel="noopener">how Google uses information from sites that use its services</a>.
+  </p>
+  <p>
+    Visitors in the European Economic Area, the United Kingdom and Switzerland are shown
+    Google's own certified consent message before advertising cookies or personalised ads are
+    used. That message is served by Google's consent management platform, not by code written
+    here. Declining does not lock you out of anything; it means the ads are non-personalised.
+  </p>
+  <p>
+    No audience list, remarketing list or custom targeting segment is built from this site.
+    In particular, nothing is targeted on the basis that a visitor is looking for a job.
+  </p>
+
+  <p class="small muted">
+    As shipped in this build: advertising is {adsOn ? 'active' : 'not active yet'}, and
+    analytics is {gaOn ? 'Google Analytics 4' : cfOn ? 'Cloudflare Web Analytics, which is cookieless' : 'not enabled'}.
+  </p>
+
+  <h2>Your choices</h2>
+  <ul>
+    <li>Block or clear cookies for this site in your browser settings.</li>
+    <li>Clear site data to remove the stored theme preference.</li>
+    <li>Turn off ad personalisation in <a href="https://www.google.com/settings/ads" rel="noopener">Google Ads Settings</a>.</li>
+    <li>Use a content blocker. Nothing on this site is gated behind advertising or analytics loading.</li>
+  </ul>
+
+  <h2>GDPR and the DPDP Act</h2>
+  <p>
+    Punehire is run from India and collects no personal data directly, so most of what a
+    data protection law governs happens at Google and Cloudflare rather than here. Under the
+    GDPR, our own processing rests on a legitimate interest in running and funding a public
+    index; for advertising and analytics cookies in the EEA, the UK and Switzerland, consent
+    is collected by Google's certified consent message described above. Under India's Digital
+    Personal Data Protection Act, 2023, the position is the same, and the only personal data
+    we hold is email you chose to send. Ask us to delete it and we will. For data held by
+    Google or Cloudflare, their own policies and controls are the effective route, and they
+    are linked above. This is a plain description of what happens, not legal advice.
+  </p>
+
+  <h2>Children</h2>
+  <p>
+    This is a job index for working adults. It is not directed at children and nothing here
+    knowingly collects information from them.
+  </p>
+
+  <h2>Changes</h2>
+  <p>
+    If what the site does changes, this page is updated in the same deploy and the date at the
+    top moves. There is no notification list, because there is no mailing list.
+  </p>
+
+  <h2>Questions</h2>
+  <p>
+    Write to <a href={`mailto:${CONTACT}`}>{CONTACT}</a>, or read
+    <a href="/contact/">contact and corrections</a> for what else that address is for.
+    Related: <a href="/terms/">terms of use</a>,
+    <a href="/disclaimer/">disclaimer</a>,
+    <a href={url.about()}>how this works</a>.
+  </p>
+</ContentShell>
+
+<style>
+  h2 { margin-top: 1.9em; }
+  ul { padding-left: 1.15em; margin: 0 0 1em; }
+  li { margin-bottom: .45em; }
+  code { font-size: .92em; background: var(--raise); padding: 1px 5px; border-radius: 5px; }
+</style>

@@ -28,7 +28,7 @@ export const GET: APIRoute = async ({ site }) => {
   const body = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Startup Radar — new roles at Pune startups</title>
+    <title>Punehire — new roles at Pune startups</title>
     <link>${abs('/')}</link>
     <atom:link href="${abs('/rss.xml')}" rel="self" type="application/rss+xml" />
     <description>Newly opened roles at Pune startups, refreshed every six hours.</description>

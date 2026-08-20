@@ -25,7 +25,7 @@ const AI_CRAWLERS = [
 ]
 
 export const GET: APIRoute = ({ site }) => {
-  const body = `# Startup Radar — Pune startup hiring map
+  const body = `# Punehire — Pune startup hiring map
 # Every page is server-rendered static HTML. No JavaScript is needed to read any content.
 
 User-agent: *

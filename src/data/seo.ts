@@ -1,7 +1,7 @@
 import type { Company, Job } from '@/lib/types'
 import { url } from './slugs'
 
-export const SITE_NAME = 'Startup Radar'
+export const SITE_NAME = 'Punehire'
 export const SITE_TAGLINE = 'Which Pune startups are hiring right now'
 
 const abs = (site: URL | string, path: string) => new URL(path, site).href

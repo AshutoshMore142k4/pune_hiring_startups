@@ -1,4 +1,4 @@
--- Startup Radar schema. Paste into Supabase SQL editor.
+-- Punehire schema. Paste into Supabase SQL editor.
 -- Two tables. Crawl history lives in GitHub Actions logs, which are free and searchable.
 
 create table if not exists companies (
@@ -7,8 +7,9 @@ create table if not exists companies (
   slug             text unique not null,
   website          text,
   careers_url      text not null,
-  ats              text,             -- greenhouse|lever|ashby|workday|smartrecruiters|recruitee, null = link-out only
+  ats              text,             -- greenhouse|lever|ashby|workday|smartrecruiters|recruitee|oracle|phenom|successfactors, null = link-out only
   ats_slug         text,             -- board token; NOT always the company name (see scraper/detect.ts)
+  kind             text not null default 'startup',  -- 'startup' | 'enterprise'. Enterprises render in a separate section and stay off the startup map.
   area             text,             -- Kharadi, Baner, Hinjawadi...
   lat              double precision,
   lng              double precision,
@@ -54,7 +55,7 @@ drop policy if exists anon_read on jobs;
 create policy anon_read on companies for select to anon, authenticated using (true);
 create policy anon_read on jobs      for select to anon, authenticated using (true);
 
--- No PostGIS: 100 markers means haversine in lib/filters.ts is enough.
+-- No PostGIS: at ~100 markers the whole dataset is read once at build time and filtered in JS.
 -- Upgrade path when server-side radius queries get slow:
 --   create extension postgis;
 --   alter table companies add column geog geography(Point,4326)
@@ -63,3 +64,4 @@ create policy anon_read on jobs      for select to anon, authenticated using (tr
 
 -- Existing installs: run this once.
 alter table jobs add column if not exists description text;
+alter table companies add column if not exists kind text not null default 'startup';

@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import SiteFooter from '../components/SiteFooter.astro'
+import { url } from '../data/slugs'
+
+/**
+ * BaseLayout directly, not ContentShell: this needs `noindex`, and it takes no data so it can
+ * render even if a build-time read failed. Cloudflare Pages auto-serves 404.html for static
+ * misses; a static host has no 500 path of its own, so this exists mainly for completeness and
+ * for any future Pages Function that wants an error page to point at.
+ */
+const description =
+  'Something went wrong loading this page. The hiring map and the latest roles are the quickest way back.'
+---
+
+<BaseLayout title="Something went wrong | Punehire" description={description} path="/500.html" noindex>
+  <div class="content">
+    <h1>Something went wrong</h1>
+    <p class="lede">
+      This page hit an error on our side. It is almost certainly temporary — the site is static,
+      so a refresh usually clears it.
+    </p>
+
+    <h2>Where to go instead</h2>
+    <div class="grid">
+      <a class="tile" href={url.home()}>
+        <h3>The hiring map</h3>
+        <span class="meta">Every tracked startup, and who is hiring</span>
+      </a>
+      <a class="tile" href={url.jobs()}>
+        <h3>Latest roles</h3>
+        <span class="meta">Newest open roles across Pune</span>
+      </a>
+      <a class="tile" href={url.companies()}>
+        <h3>All startups</h3>
+        <span class="meta">The full tracked list</span>
+      </a>
+    </div>
+
+    <p class="say small muted" style="margin-top:24px">
+      If it keeps happening, <a href="/contact/">let us know</a>.
+    </p>
+  </div>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>
+
+<style>
+  .say { max-width: 62ch; }
+  h2 { margin-top: 28px; }
+</style>

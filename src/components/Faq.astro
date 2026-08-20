@@ -1,0 +1,52 @@
+---
+/**
+ * Presentational only. The FAQPage JSON-LD is emitted by the page via faqPageLd() so the
+ * schema lives next to the rest of a page's structured data — this component just renders the
+ * visible answers, which are the part that actually helps a reader. Native <details> means no
+ * JavaScript: the answers are in the DOM for a crawler whether or not anything runs.
+ */
+import type { FaqItem } from '../data/faq'
+
+interface Props {
+  items: FaqItem[]
+  heading?: string
+}
+const { items, heading = 'Frequently asked questions' } = Astro.props
+---
+
+{items.length > 0 && (
+  <section class="faq" aria-labelledby="faq-h">
+    <h2 id="faq-h">{heading}</h2>
+    {items.map((it, i) => (
+      <details open={i === 0}>
+        <summary>{it.q}</summary>
+        <div class="faq-a">
+          <p>{it.a}</p>
+          {it.link && <p><a href={it.link.href}>{it.link.text} &rarr;</a></p>}
+        </div>
+      </details>
+    ))}
+  </section>
+)}
+
+<style>
+  .faq { max-width: 72ch; margin: 2.4em 0; }
+  .faq h2 { margin-bottom: .4em; }
+  .faq details { border-top: 1px solid var(--line); }
+  .faq details:last-of-type { border-bottom: 1px solid var(--line); }
+  .faq summary {
+    cursor: pointer;
+    padding: .8em 0;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 1.2em;
+  }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; color: var(--muted); font-weight: 400; }
+  .faq details[open] summary::after { content: '\2013'; }
+  .faq-a { padding: 0 0 1em; color: var(--muted); }
+  .faq-a p { margin: 0 0 .5em; max-width: 68ch; }
+  .faq-a a { color: var(--ink); }
+</style>

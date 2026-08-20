@@ -1,31 +1,35 @@
 ---
 import ContentShell from '../../layouts/ContentShell.astro'
-import { loadAll, type CompanyWithJobs } from '../../data/load'
+import { loadEvery, type CompanyWithJobs } from '../../data/load'
 import { collectionLd, organizationLd } from '../../data/seo'
 import { jobSlug, url } from '../../data/slugs'
 import { timeAgo } from '@/lib/filters'
 
 export async function getStaticPaths() {
-  const companies = await loadAll()
+  // loadEvery, not loadAll: enterprises share this route, so every company gets a page.
+  const companies = await loadEvery()
   return companies.map((company) => ({ params: { slug: company.slug }, props: { company } }))
 }
 
 const { company: c } = Astro.props as { company: CompanyWithJobs }
+const isEnterprise = c.kind === 'enterprise'
 
-const all = await loadAll()
+// Neighbours are drawn from the same section, so an enterprise lists other enterprises.
+const all = (await loadEvery()).filter((o) => o.kind === c.kind)
 const neighbours = all
   .filter((o) => o.slug !== c.slug && o.area === c.area)
   .sort((a, b) => b.jobs.length - a.jobs.length)
   .slice(0, 6)
 
 const hiring = c.jobs.length > 0
+const kindNoun = isEnterprise ? 'company' : 'startup'
 const title = hiring
   ? `${c.name} jobs in Pune — ${c.jobs.length} open ${c.jobs.length === 1 ? 'role' : 'roles'}`
-  : `${c.name} — Pune startup careers`
+  : `${c.name} — Pune ${kindNoun} careers`
 const description = hiring
   ? `${c.jobs.length} open roles at ${c.name}${c.area ? ` in ${c.area}, Pune` : ' in Pune'}. ` +
-    `${c.industry ?? 'Startup'}, ${c.headcount_band ?? 'growing team'}. Updated ${timeAgo(c.last_crawled_at)}.`
-  : `${c.name} is a ${c.industry ?? 'startup'}${c.area ? ` in ${c.area}, Pune` : ' in Pune'}. ` +
+    `${c.industry ?? (isEnterprise ? 'Company' : 'Startup')}, ${c.headcount_band ?? 'growing team'}. Updated ${timeAgo(c.last_crawled_at)}.`
+  : `${c.name} is a ${c.industry ?? kindNoun}${c.area ? ` in ${c.area}, Pune` : ' in Pune'}. ` +
     `No live feed yet — see their careers page for openings.`
 
 const jsonLd = [
@@ -47,11 +51,16 @@ const jsonLd = [
 ---
 
 <ContentShell
-  title={`${title} | Startup Radar`}
+  title={`${title} | Punehire`}
   description={description}
   path={url.company(c.slug)}
   h1={title}
-  crumbs={[{ name: 'Startups', href: url.companies() }, { name: c.name, href: url.company(c.slug) }]}
+  crumbs={[
+    isEnterprise
+      ? { name: 'IT companies', href: url.enterprises() }
+      : { name: 'Startups', href: url.companies() },
+    { name: c.name, href: url.company(c.slug) },
+  ]}
   jsonLd={jsonLd}
 >
   <dl class="factbox">
@@ -96,12 +105,12 @@ const jsonLd = [
 
   {neighbours.length > 0 && (
     <>
-      <h2 style="margin-top:2em">Other startups in {c.area}</h2>
+      <h2 style="margin-top:2em">Other {isEnterprise ? 'companies' : 'startups'} in {c.area}</h2>
       <div class="grid">
         {neighbours.map((o) => (
           <a class="tile" href={url.company(o.slug)}>
             <h3>{o.name}</h3>
-            <span class="meta">{o.industry ?? 'Startup'}</span>
+            <span class="meta">{o.industry ?? (isEnterprise ? 'Company' : 'Startup')}</span>
             <span class:list={['badge', o.jobs.length === 0 && 'is-idle']}>
               <span class:list={['dot', o.jobs.length === 0 && 'is-idle']}></span>
               {o.jobs.length ? `${o.jobs.length} open` : 'careers page'}

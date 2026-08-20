@@ -8,14 +8,16 @@
  * the scheduled workflow does not fail for anyone who has not set them up.
  *
  *   GOOGLE_SERVICE_ACCOUNT_JSON  service-account key, added as an owner in Search Console
- *   INDEXNOW_KEY                 any 8-128 hex string, also hosted at /<key>.txt
+ *   PUBLIC_INDEXNOW_KEY          any 8-128 chars of [a-zA-Z0-9-]. Must be the PUBLIC_ one, since
+ *                                that is what src/pages/[key].txt.ts serves at /<key>.txt for
+ *                                IndexNow to verify against. INDEXNOW_KEY still works as a fallback.
  *   SITE_URL                     defaults to the Cloudflare Pages subdomain
  */
 import { createSign } from 'node:crypto'
 import { createClient } from '@supabase/supabase-js'
 import { jobSlug, url as u } from '../src/data/slugs'
 
-const SITE = (process.env.SITE_URL ?? 'https://startup-radar.pages.dev').replace(/\/$/, '')
+const SITE = (process.env.SITE_URL ?? 'https://punehire.pages.dev').replace(/\/$/, '')
 const WINDOW_HOURS = 7 // one crawl interval plus slack
 const all = process.argv.includes('--all')
 
@@ -92,8 +94,9 @@ async function google(urls: string[]) {
 
 /** One batch call covers Bing and Copilot. Up to 10,000 URLs per request. */
 async function indexNow(urls: string[]) {
-  const key = process.env.INDEXNOW_KEY
-  if (!key) return console.log('· IndexNow skipped (INDEXNOW_KEY unset)')
+  // Same var the build serves the key file from, or verification 403s on a key mismatch.
+  const key = process.env.PUBLIC_INDEXNOW_KEY ?? process.env.INDEXNOW_KEY
+  if (!key) return console.log('· IndexNow skipped (PUBLIC_INDEXNOW_KEY unset)')
 
   const host = new URL(SITE).host
   const res = await fetch('https://api.indexnow.org/indexnow', {

@@ -1,0 +1,85 @@
+---
+import ContentShell from '../layouts/ContentShell.astro'
+import { url } from '../data/slugs'
+
+const UPDATED = '19 August 2026'
+const CONTACT = import.meta.env.PUBLIC_CONTACT_EMAIL ?? 'hello@punehire.com'
+
+const description =
+  'What Punehire does and does not stand behind: listings are informational and drawn from ' +
+  'employer feeds as is, nothing here is a job offer, and nothing here is professional advice.'
+---
+
+<ContentShell
+  title="Disclaimer | Punehire"
+  description={description}
+  path="/disclaimer/"
+  h1="Disclaimer"
+  lede="Punehire is an index that points at jobs published by other companies. This page states plainly what that does, and does not, make it responsible for."
+  crumbs={[{ name: 'Disclaimer', href: '/disclaimer/' }]}
+  narrow
+>
+  <p class="small muted">Last updated {UPDATED}.</p>
+
+  <h2>Informational only</h2>
+  <p>
+    Everything on this site is provided for general information. A listing is a pointer to a
+    role an employer published in its own hiring system, reproduced here to help you find it —
+    not a recommendation, an endorsement, or a statement that the role is right for you. Decide
+    for yourself whether to apply, and verify anything that matters on the employer's own page
+    before you act on it.
+  </p>
+
+  <h2>No job offer, no employment relationship</h2>
+  <p>
+    Nothing here is an offer of employment and nothing here creates any relationship between you
+    and Punehire or between you and an employer. Punehire is not the hiring company, is not a
+    recruiter or agent for it, and plays no part in whether an application succeeds. An
+    application is submitted on the employer's own system and is decided entirely by them.
+  </p>
+
+  <h2>Accuracy and currency</h2>
+  <p>
+    Feeds are re-read every six hours and the site is rebuilt from the result, so a role can
+    close in the gap between two crawls. Some fields — experience ranges, role tags, remote
+    classification, the area a company is filed under — are derived by pattern matching or kept
+    by hand and are wrong sometimes. The listings are provided as is and without warranty of
+    accuracy, completeness or availability. How each field is produced, and its limits, is set
+    out in <a href={url.about()}>how this works</a>.
+  </p>
+
+  <h2>Not professional advice</h2>
+  <p>
+    The guides and explanatory pages on this site are one maintainer's read of the Pune startup
+    job market, not professional career, financial or legal advice. They carry no salary data
+    and no ranking of employers, because the underlying feeds contain neither and inventing
+    either would be worse than the gap. Treat them as background, not as a decision made for you.
+  </p>
+
+  <h2>External sites</h2>
+  <p>
+    Apply links and company links lead to third-party sites — the employer's applicant tracking
+    system or its own pages. Punehire does not control those sites, is not responsible for their
+    content, accuracy or privacy practices, and linking to one is not an endorsement of it. Once
+    you leave this site, that site's terms and privacy policy apply, not this one.
+  </p>
+
+  <h2>Company names and trademarks</h2>
+  <p>
+    Company names, logos and job titles belong to their respective owners and are used here only
+    to identify who is hiring and for what. Their appearance does not imply any affiliation with,
+    or endorsement by, those companies.
+  </p>
+
+  <h2>Get something corrected</h2>
+  <p>
+    If a listing is stale, wrong, or should not be here, that is worth fixing. Write to
+    <a href={`mailto:${CONTACT}`}>{CONTACT}</a> or see
+    <a href="/contact/">contact and corrections</a>. Related:
+    <a href="/terms/">terms of use</a>, <a href="/privacy/">privacy policy</a>.
+  </p>
+</ContentShell>
+
+<style>
+  h2 { margin-top: 1.9em; }
+</style>

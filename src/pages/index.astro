@@ -4,13 +4,16 @@ import SiteFooter from '../components/SiteFooter.astro'
 import CompanyCard from '../components/CompanyCard.astro'
 import { areas, allJobs, loadAll, stats } from '../data/load'
 import { collectionLd, websiteLd } from '../data/seo'
-import { FUNCTIONS, timeAgo } from '@/lib/filters'
+import { siteFaq, faqPageLd } from '../data/faq'
+import Faq from '../components/Faq.astro'
+import { FUNCTIONS, jobFunctions, timeAgo, type FunctionTag } from '@/lib/filters'
 import { jobSlug, url } from '../data/slugs'
 
 const companies = await loadAll()
 const s = await stats()
 const byArea = await areas()
 const latest = (await allJobs()).slice(0, 12)
+const faq = await siteFaq()
 
 const sorted = [...companies].sort(
   (a, b) => b.jobs.length - a.jobs.length || a.name.localeCompare(b.name),
@@ -25,6 +28,23 @@ const description =
   `A live map of which Pune startups are hiring. ${s.jobs} open roles across ${s.hiring} of ` +
   `${s.companies} tracked startups, pulled straight from company job feeds and refreshed every six hours.`
 
+// Figures the prose below quotes. Derived, never hardcoded — the copy cannot drift from the data.
+const jobs = companies.flatMap((c) => c.jobs)
+const feeds = companies.filter((c) => c.ats)
+const topAreas = byArea.filter((a) => a.companies.some((c) => c.jobs.length > 0)).slice(0, 6)
+const roleCounts = Object.keys(FUNCTIONS)
+  .map((tag) => ({ tag, n: jobs.filter((j) => jobFunctions(j.title).includes(tag as FunctionTag)).length }))
+  .filter((r) => r.n > 0)
+  .sort((a, b) => b.n - a.n)
+const freshers = jobs.filter((j) => j.experience_max !== null && j.experience_max <= 2).length
+const interns = jobs.filter((j) => j.employment_type === 'internship' || j.experience_max === 0).length
+const flexible = jobs.filter((j) => j.remote_type === 'remote' || j.remote_type === 'hybrid').length
+const atsNames = [...new Set(feeds.map((c) => c.ats))].sort()
+const busiestArea = [...byArea].sort(
+  (a, b) =>
+    b.companies.reduce((n, c) => n + c.jobs.length, 0) - a.companies.reduce((n, c) => n + c.jobs.length, 0),
+)[0]
+
 const jsonLd = [
   websiteLd(Astro.site!),
   collectionLd(
@@ -33,6 +53,7 @@ const jsonLd = [
     sorted.map((c) => ({ name: c.name, href: url.company(c.slug) })),
     Astro.site!,
   ),
+  faqPageLd(faq, Astro.site!, '/'),
 ]
 ---
 
@@ -78,6 +99,8 @@ const jsonLd = [
   <script type="application/json" id="map-data" set:html={JSON.stringify(points)} is:inline></script>
 
   <div class="content">
+    <Faq items={faq} heading="Pune startup jobs — common questions" />
+
     <h2>Browse Pune startups by area</h2>
     <p class="lede">
       Pune's startup hiring clusters around a handful of neighbourhoods. Pick one to see who is
@@ -124,6 +147,134 @@ const jsonLd = [
       ))}
     </div>
     <p style="margin-top:14px"><a href={url.jobs()}>All {s.jobs} open roles &rarr;</a></p>
+
+    <section class="longform">
+      <h2>Pune startup jobs, and how to read this map</h2>
+      <p>
+        Pune has two job markets that get confused with each other. One is the services and GCC
+        market — the large campuses in Hinjawadi and Kharadi that hire in hundreds and advertise
+        everywhere. The other is the product startup market: smaller teams, fewer openings, and
+        roles that are often filled before they ever reach a job portal. This site tracks the second
+        one. It follows {s.companies} Pune startups and shows the {s.jobs} roles currently open
+        across the {s.hiring} of them that are hiring today. The large services companies, GCCs
+        and banks are tracked separately, on <a href={url.enterprises()}>IT companies hiring in
+        Pune</a>.
+      </p>
+      <p>
+        Nothing here is typed in by hand. Each listing is read from the company's own applicant
+        tracking system — the same feed their careers page uses — and re-read every six hours. A
+        role appears here because the employer is publishing it right now, and it disappears when
+        they stop. That is the whole trick: this is not a database of jobs that were posted once,
+        it is a view of what is genuinely open this morning.
+      </p>
+
+      <h3>Where in Pune the startups actually are</h3>
+      <p>
+        Startup hiring in Pune clusters into a handful of neighbourhoods, and knowing which one a
+        company sits in tells you more about your commute than any job description will.
+        {busiestArea && (
+          <> Right now {busiestArea.name} has the most open roles of any area on the map.</>
+        )}
+      </p>
+      <ul>
+        {topAreas.map((a) => (
+          <li>
+            <a href={url.area(a.name)}>Startups hiring in {a.name}</a> — {a.companies.length}{' '}
+            {a.companies.length === 1 ? 'company' : 'companies'},{' '}
+            {a.companies.reduce((n, c) => n + c.jobs.length, 0)}{' '}
+            {a.companies.reduce((n, c) => n + c.jobs.length, 0) === 1 ? 'open role' : 'open roles'}
+          </li>
+        ))}
+      </ul>
+      <p>
+        Hinjawadi and its Rajiv Gandhi Infotech Park hold the largest concentration of engineering
+        teams, and the traffic on the Mumbai–Bangalore highway at 9am reflects that. Baner and
+        Balewadi sit closer to the city and attract mid-sized product companies. Kharadi, around
+        EON IT Park, leans enterprise. Magarpatta and Hadapsar in the east and Viman Nagar near the
+        airport hold smaller offices. Pin positions on the map are neighbourhood centroids rather
+        than street addresses, so treat them as "which part of town", not "which building".
+      </p>
+
+      <h3>What is open right now</h3>
+      <p>
+        The mix shifts week to week, which is exactly why a static list of "top companies in Pune"
+        is useless for a job search. As of the last crawl:
+      </p>
+      <ul>
+        {roleCounts.map((r) => (
+          <li>
+            <a href={url.role(r.tag)}>{r.tag} roles</a> — {r.n} open
+          </li>
+        ))}
+      </ul>
+      <p>
+        Engineering is almost always the largest group, but the interesting signal is the
+        proportion. A startup opening its first product or design roles is usually past survival
+        mode; a company posting only sales roles is chasing revenue on a product it already has.
+        You can read a fair amount about a company's stage from what it is hiring for, and this map
+        makes that comparison possible in one screen.
+      </p>
+
+      <h3>Freshers, interns and early-career roles</h3>
+      <p>
+        {freshers > 0 ? (
+          <>
+            There {freshers === 1 ? 'is' : 'are'} currently {freshers} open{' '}
+            {freshers === 1 ? 'role' : 'roles'} that ask for two years of experience or less, and{' '}
+            {interns} tagged as an internship. Those are on{' '}
+            <a href="/fresher-jobs-in-pune/">fresher jobs in Pune</a> and{' '}
+            <a href="/internships-in-pune/">internships in Pune</a>.
+          </>
+        ) : (
+          <>
+            No fresher-level roles are open across the tracked companies at the moment. That happens
+            — startup fresher hiring in Pune runs in bursts rather than continuously. The{' '}
+            <a href="/fresher-jobs-in-pune/">fresher jobs page</a> will fill up again when it does.
+          </>
+        )}
+      </p>
+      <p>
+        Experience ranges here are inferred from the job title and description, because most Indian
+        postings state seniority in words rather than numbers. "SDE-1", "Associate Engineer" and
+        "Engineer II" all mean something different at different companies. Treat the filter as a
+        shortcut for narrowing a list, not as a rule about who may apply — startups routinely
+        interview people who are a year short of what the posting asked for.
+      </p>
+
+      <h3>Remote and hybrid</h3>
+      <p>
+        {flexible} of the open roles mention remote or hybrid work. A role only appears on this map
+        if it names Pune or names India without naming another metro, because a bare "Remote" on a
+        job board is usually US-remote and filling a Pune map with San Francisco listings would make
+        it worthless. That rule drops some genuinely open roles, which is a trade we make
+        deliberately.
+      </p>
+
+      <h3>How this differs from a job portal</h3>
+      <p>
+        A portal wants your CV in its database. This site has no account, no upload, no fee, and no
+        way to apply through it — every apply button goes straight to the employer's own
+        {' '}{atsNames.join(', ')} page, which is where the application would have to end up anyway.
+        The upside for you is that there is no intermediary deciding whether your application gets
+        forwarded. The upside for us is that we can afford to be honest about coverage.
+      </p>
+      <p>
+        And the coverage gap is real: {feeds.length} of the {s.companies} tracked startups publish a
+        machine-readable feed. The rest appear on the map with a careers link and no role count, not
+        because they are not hiring, but because their hiring tool publishes nothing a machine can
+        read. Inventing listings for them would make the map look fuller and be worth less. The
+        <a href={url.about()}>methodology page</a> sets out every limit of this kind.
+      </p>
+
+      <h3>Using this as an ongoing search</h3>
+      <p>
+        Startup roles in Pune close fast, and the practical advantage is being early rather than
+        being thorough. New roles land on <a href={url.jobs()}>the latest roles page</a> and in the
+        <a href="/rss.xml">RSS feed</a> as soon as a crawl picks them up, so a feed reader will tell
+        you about an opening the same day it is published. The full dataset is also available as
+        <a href="/data/jobs.json">JSON</a> if you would rather filter it yourself.
+      </p>
+    </section>
   </div>
 
   <SiteFooter slot="footer" />
@@ -132,3 +283,14 @@ const jsonLd = [
 <script>
   import '../scripts/app.ts'
 </script>
+
+<style>
+  /* The long-form block below the map. Narrow measure because this is prose, not a listing. */
+  .longform { max-width: 72ch; margin-top: 2.6em; }
+  .longform h2 { margin-bottom: .35em; }
+  .longform h3 { margin: 1.9em 0 .4em; font-size: 1.02rem; }
+  .longform p { margin: 0 0 1em; }
+  .longform ul { margin: 0 0 1.2em; padding-left: 1.15em; }
+  .longform li { margin-bottom: .35em; color: var(--muted); }
+  .longform li a { color: var(--ink); }
+</style>

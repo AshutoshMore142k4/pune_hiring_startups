@@ -1,0 +1,132 @@
+---
+import ContentShell from '../../layouts/ContentShell.astro'
+import { allJobs, loadAll, stats } from '../../data/load'
+import { SITE_NAME } from '../../data/seo'
+import { url } from '../../data/slugs'
+import { GUIDES, articleLd, guideUrl, otherGuides } from '../../data/guides'
+
+const guide = GUIDES.find((g) => g.slug === 'pune-startup-jobs-for-freshers')!
+
+const jobs = await allJobs()
+const companies = await loadAll()
+const s = await stats()
+
+const feeds = companies.filter((c) => c.ats)
+const atsNames = [...new Set(feeds.map((c) => c.ats))].sort()
+const fresher = jobs.filter((j) => j.experience_max !== null && j.experience_max <= 2)
+const interns = jobs.filter((j) => j.employment_type === 'internship' || j.experience_max === 0)
+const freshCompanies = [...new Set(fresher.map((j) => j.company.name))]
+
+const description = guide.blurb
+---
+
+<ContentShell
+  title={`${guide.title} | ${SITE_NAME}`}
+  description={description}
+  path={guideUrl(guide.slug)}
+  h1={guide.h1}
+  lede={description}
+  crumbs={[{ name: 'Guides', href: '/guides/' }, { name: guide.nav, href: guideUrl(guide.slug) }]}
+  jsonLd={[articleLd(guide, Astro.site!, SITE_NAME)]}
+  narrow
+>
+  <p>
+    Pune has two ways in for a fresher, and they work nothing alike. The services and GCC
+    campuses in Hinjawadi and Kharadi hire graduates in the hundreds through aptitude tests and
+    campus drives, months ahead of a start date. The product startups this site tracks do the
+    opposite: they hire a handful of juniors at a time, when a team has the room to bring one up,
+    and they decide on what you can actually build rather than on a percentile. This guide is
+    about the second route.
+  </p>
+
+  <h2>What is open at this level right now</h2>
+  <p>
+    {fresher.length > 0 ? (
+      <>
+        {fresher.length} of the {s.jobs} roles open across the tracked startups ask for two years
+        of experience or less, and {interns.length} {interns.length === 1 ? 'is' : 'are'} tagged
+        as an internship. They are collected on{' '}
+        <a href="/fresher-jobs-in-pune/">fresher jobs in Pune</a> and{' '}
+        <a href="/internships-in-pune/">internships in Pune</a>, rebuilt from the feeds every six
+        hours.
+        {freshCompanies.length > 0 && (
+          <> Hiring at this level today: {freshCompanies.slice(0, 10).join(', ')}
+            {freshCompanies.length > 10 ? ' and others' : ''}.</>
+        )}
+      </>
+    ) : (
+      <>
+        Nothing at two years or less is open across the tracked startups this morning. That is
+        normal rather than a gap — startup fresher hiring runs in bursts, and the{' '}
+        <a href="/fresher-jobs-in-pune/">fresher jobs page</a> refills when a crawl finds new
+        roles. The reliable way to catch them is the <a href="/rss.xml">RSS feed</a>, which lists
+        a role the same day it is published.
+      </>
+    )}
+  </p>
+
+  <h2>Why the list is short</h2>
+  <p>
+    A startup opens a junior role when it has someone with the time to mentor and work steady
+    enough to hand over. That is a narrower condition than a large company faces, so the openings
+    come in ones and twos and dry up between them. It is not a measure of how much a company is
+    hiring overall — a team can be growing fast and still have no fresher seat open, because every
+    senior is busy shipping. Read a short list as "not this week", not "not here".
+  </p>
+
+  <h2>What entry-level startup roles actually ask for</h2>
+  <p>
+    The titles vary — SDE-1, Associate Engineer, Graduate Engineer Trainee, Junior Developer,
+    Intern — and mean roughly the same thing: someone in their first year or two who can already
+    write working code. What moves an application at this level is evidence you can build. One
+    finished project with a link — a deployed app, a merged pull request to something real, a
+    repository that is more than a tutorial — outweighs a strong CGPA on its own, because it
+    answers the only question the team has, which is whether you can do the work.
+  </p>
+  <p>
+    Experience levels on this site are inferred from the role title and description by pattern
+    matching, not read from a structured field the employer filled in, so the filter is a way to
+    narrow a list rather than a rule about who may apply. Startups here interview people a year
+    short of what a posting asks for more often than a portal would suggest. If you meet most of
+    the must-haves, apply. How that inference works, and where it is wrong, is in{' '}
+    <a href={url.about()}>how this works</a>.
+  </p>
+
+  <h2>Applying through a company ATS is not applying on Naukri</h2>
+  <p>
+    Every apply button here goes to the employer's own hiring system —{' '}
+    {atsNames.length ? atsNames.join(', ') : 'the company ATS'} — not to an inbox this site owns
+    and not to a recruiter who decides whether to pass you on. There is no intermediary and no
+    database selling your profile on. The trade-off is that spraying does not work: a generic
+    application to a five-person team is obvious and ignored. The move that works is the opposite
+    of the portal habit — read the posting, say in two lines why this specific role, and link to
+    something you made. Ten applications done that way beat a hundred one-click ones.
+  </p>
+
+  <h2>Being early beats being thorough</h2>
+  <p>
+    Junior roles at small teams close fast, sometimes within days, because a good early
+    application ends the search. The practical edge is speed. New roles land on{' '}
+    <a href={url.jobs()}>the latest roles page</a> and in the <a href="/rss.xml">RSS feed</a> as
+    soon as a crawl picks them up, so a feed reader will tell you about an opening the morning it
+    appears. Checking a portal once a week is how you find out about it after it closed.
+  </p>
+
+  <h2>What this guide cannot tell you</h2>
+  <p class="muted">
+    There is no salary figure here. The feeds this site reads almost never carry a pay band, so
+    any number on this page would be invented, and inventing one is worse than the gap. Ask about
+    compensation directly once you are talking to the team — a startup that will not discuss it
+    early is telling you something.
+  </p>
+
+  <h2 style="margin-top:2em">Other guides</h2>
+  <div class="grid">
+    {otherGuides(guide.slug).map((g) => (
+      <a class="tile" href={guideUrl(g.slug)}>
+        <h3>{g.nav}</h3>
+        <span class="meta">{g.blurb}</span>
+      </a>
+    ))}
+  </div>
+</ContentShell>

@@ -1,0 +1,131 @@
+---
+import ContentShell from '../layouts/ContentShell.astro'
+import { url } from '../data/slugs'
+
+const UPDATED = '19 August 2026'
+const CONTACT = import.meta.env.PUBLIC_CONTACT_EMAIL ?? 'hello@punehire.com'
+
+const mail = (subject: string) => `mailto:${CONTACT}?subject=${encodeURIComponent(subject)}`
+
+const description =
+  'How to reach the person who maintains Punehire: corrections, a missing company, ' +
+  'a listing that should come down, and how long a reply actually takes.'
+---
+
+<ContentShell
+  title="Contact and corrections | Punehire"
+  description={description}
+  path="/contact/"
+  h1="Contact and corrections"
+  lede="One email address, read by the person who maintains this site. There is no form here, because there is no server behind this site to receive one."
+  crumbs={[{ name: 'Contact', href: '/contact/' }]}
+  narrow
+>
+  <p>
+    <a class="apply" href={mail('Punehire')}>{CONTACT}</a>
+  </p>
+  <p class="small muted">
+    That link opens your own mail client. Nothing is submitted through this page, and no
+    contact details are stored anywhere on this site.
+  </p>
+
+  <h2>What to write about</h2>
+  <ul>
+    <li>
+      <strong>A company in the wrong area.</strong> Areas are assigned by hand from a curated
+      list, so this is exactly the kind of error worth reporting. Send the company and the
+      correct area, and a link if you have one.
+    </li>
+    <li>
+      <strong>A missing startup.</strong> If a Pune startup should be tracked here, send its
+      name and careers page URL. Companies with a public feed from Greenhouse, Lever, Ashby,
+      Workday, SmartRecruiters or Recruitee can be added with live roles; the rest can be
+      listed with a careers link only.
+    </li>
+    <li>
+      <strong>A role that should not be here.</strong> Filled, withdrawn, never in Pune,
+      posted by mistake. Send the page URL.
+    </li>
+    <li>
+      <strong>A removal or takedown request.</strong> See below.
+    </li>
+    <li>
+      <strong>A listing that looks like a scam.</strong> Anything asking a candidate for money
+      to apply. Send the URL and it comes down while it is checked, not after.
+    </li>
+    <li>
+      <strong>Anything factually wrong on any page.</strong> Including this one.
+    </li>
+  </ul>
+
+  <h2>Removals and takedowns</h2>
+  <p>
+    If you are the employer, or you act for them, and you want a job listing or an entire
+    company page removed from this site, that request is honoured. No argument, no form, no
+    justification needed.
+  </p>
+  <p>
+    <a class="apply" href={mail('Removal request')}>Send a removal request</a>
+  </p>
+  <p>
+    Include the page URL or the company name, and say whether you want a single role removed
+    or the company excluded from the index entirely. An exclusion is permanent: the company is
+    added to a do-not-crawl list, so it does not reappear the next time its feed is read.
+  </p>
+  <p>
+    Removal requests are dealt with before anything else in the inbox. The listing is taken
+    out at the next build, which runs every six hours. If a request is urgent, say so in the
+    subject line and the build can be triggered immediately.
+  </p>
+
+  <h2>How long a reply takes</h2>
+  <p>
+    This site is maintained by one person alongside other work. Removal and scam reports are
+    handled within a day or two. Corrections and additions are usually read within a few days
+    and applied in a batch, because most of them mean editing the curated company list rather
+    than replying to an email. Every message is read; not every message gets a reply.
+  </p>
+  <p>
+    Once a fix lands in the data, the site picks it up at the next scheduled build, within six
+    hours.
+  </p>
+
+  <h2>What this address is not for</h2>
+  <ul>
+    <li>
+      <strong>Applications.</strong> We do not accept CVs, and one sent here will not reach any
+      employer. Apply on the company's own site, through the apply button on the role's page.
+    </li>
+    <li>
+      <strong>Job-hunt help.</strong> No referrals, no introductions, no interview coaching.
+      This is an index, not a placement service.
+    </li>
+    <li>
+      <strong>Paid placement.</strong> Listings cannot be bought, promoted or ranked higher.
+      There is no price, so please do not ask for one.
+    </li>
+    <li>
+      <strong>Guest posts, link exchanges and SEO offers.</strong> These are deleted unread.
+    </li>
+  </ul>
+
+  <h2>Before you write</h2>
+  <p>
+    <a href={url.about()}>How this works</a> covers where the listings come from, why some
+    companies show a careers link and no roles, and the known limits of the area, experience
+    and remote fields. Several common corrections are already answered there.
+  </p>
+  <p>
+    Also: <a href="/privacy/">privacy policy</a>,
+    <a href="/terms/">terms of use</a>,
+    <a href="/disclaimer/">disclaimer</a>.
+  </p>
+
+  <p class="small muted">Last updated {UPDATED}.</p>
+</ContentShell>
+
+<style>
+  h2 { margin-top: 1.9em; }
+  ul { padding-left: 1.15em; margin: 0 0 1em; }
+  li { margin-bottom: .55em; }
+</style>

@@ -3,6 +3,8 @@ import ContentShell from '../../layouts/ContentShell.astro'
 import JobRows from '../../components/JobRows.astro'
 import { areas, type CompanyWithJobs } from '../../data/load'
 import { collectionLd } from '../../data/seo'
+import { areaFaq, faqPageLd } from '../../data/faq'
+import Faq from '../../components/Faq.astro'
 import { areaSlug, url } from '../../data/slugs'
 
 export async function getStaticPaths() {
@@ -14,6 +16,7 @@ const { name, companies } = Astro.props as { name: string; companies: CompanyWit
 
 const jobs = companies.flatMap(({ jobs, ...company }) => jobs.map((j) => ({ ...j, company })))
 const hiring = companies.filter((c) => c.jobs.length > 0)
+const faq = await areaFaq(name)
 
 const h1 = `Startups hiring in ${name}, Pune`
 const description =
@@ -22,13 +25,16 @@ const description =
 ---
 
 <ContentShell
-  title={`${h1} — ${jobs.length} open roles | Startup Radar`}
+  title={`${h1} — ${jobs.length} open roles | Punehire`}
   description={description}
   path={url.area(name)}
   h1={h1}
   lede={description}
   crumbs={[{ name: 'Areas', href: '/areas/' }, { name, href: url.area(name) }]}
-  jsonLd={[collectionLd(h1, description, companies.map((c) => ({ name: c.name, href: url.company(c.slug) })), Astro.site)]}
+  jsonLd={[
+    collectionLd(h1, description, companies.map((c) => ({ name: c.name, href: url.company(c.slug) })), Astro.site),
+    faqPageLd(faq, Astro.site, url.area(name)),
+  ]}
 >
   <h2>Startups based in {name}</h2>
   <div class="grid">
@@ -48,4 +54,6 @@ const description =
   <JobRows jobs={jobs} />
 
   <p style="margin-top:2em"><a href="/areas/">All Pune startup areas &rarr;</a></p>
+
+  <Faq items={faq} heading={`Startups hiring in ${name} — FAQ`} />
 </ContentShell>

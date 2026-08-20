@@ -1,0 +1,64 @@
+---
+import ContentShell from '../../layouts/ContentShell.astro'
+import { stats } from '../../data/load'
+import { collectionLd } from '../../data/seo'
+import { GUIDES, guideUrl } from '../../data/guides'
+
+const s = await stats()
+
+const h1 = 'Guides to the Pune startup job market'
+const description =
+  'Four written guides to looking for work at a Pune startup: where the offices are, what ' +
+  'entry-level roles ask for, how to read a posting, and what each ATS does to your time.'
+---
+
+<ContentShell
+  title={`${h1} | Punehire`}
+  description={description}
+  path="/guides/"
+  h1={h1}
+  lede={description}
+  crumbs={[{ name: 'Guides', href: '/guides/' }]}
+  jsonLd={[
+    collectionLd(
+      h1,
+      description,
+      GUIDES.map((g) => ({ name: g.title, href: guideUrl(g.slug) })),
+      Astro.site,
+    ),
+  ]}
+  narrow
+>
+  <p>
+    The rest of this site is generated. A crawler reads {s.companies} company job feeds every
+    six hours and the pages rebuild themselves from whatever came back. These four pages are
+    the exception: they are written by hand, and the only numbers in them are pulled from the
+    same database at build time so that a guide can never end up contradicting a listing.
+  </p>
+  <p>
+    They are written for someone actually job-hunting in Pune, not for someone reading about
+    job-hunting. Where a guide does not know something — what a company pays, whether a team
+    really works hybrid — it says so rather than filling the gap.
+  </p>
+
+  <div class="grid" style="margin-top:1.6em">
+    {GUIDES.map((g) => (
+      <a class="tile" href={guideUrl(g.slug)}>
+        <h3>{g.nav}</h3>
+        <span class="meta">{g.blurb}</span>
+      </a>
+    ))}
+  </div>
+
+  <h2 style="margin-top:2.2em">What these are not</h2>
+  <p class="muted">
+    There is no salary data here. This site reads public job feeds, and Indian startups almost
+    never publish a salary band in one, so any figure on this page would be invented. There is
+    no company ranking either, and no advice about which employer is a good one to work for —
+    that is a judgement the data cannot support. What the guides can do is explain what the
+    listings mean, which is a narrower and more honest job.
+  </p>
+  <p class="small muted">
+    Method, sources and known gaps are set out in <a href="/about/">how this works</a>.
+  </p>
+</ContentShell>

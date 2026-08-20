@@ -1,0 +1,45 @@
+# Cloudflare Pages response headers. Astro copies public/ into dist/ verbatim, so this
+# ships as dist/_headers and Cloudflare reads it at deploy time. Comment lines start with
+# #; header lines must be indented. Cloudflare consumes this file, it is not served.
+
+# ── Preview and branch deployments: keep them out of the index ────────────────
+# A rule key may be a full absolute URL, and Cloudflare matches on the host as well as the
+# path. `:name` is a placeholder for one host segment (protocol and port are ignored when
+# matching, the host is not). This matches <hash>.<project>.pages.dev and
+# <branch>.<project>.pages.dev — four host segments — so it cannot match the three-segment
+# production host discussed below.
+https://:version.:project.pages.dev/*
+	X-Robots-Tag: noindex
+
+# ── The production pages.dev host: do NOT noindex it while it is the live site ─
+# punehire.pages.dev is currently the real site, not a duplicate of one. astro.config.mjs
+# defaults SITE_URL to it, every canonical and every <loc> in sitemap.xml points at it, and
+# robots.txt allows it. Adding noindex here would deindex all 128 pages and fail AdSense
+# review, which requires indexable content.
+#
+# Enable the rule below ONLY after a custom domain is attached in Cloudflare Pages AND
+# SITE_URL is repointed at that domain — that is the moment pages.dev becomes a duplicate.
+# Verify after that deploy:
+#   curl -sI https://punehire.pages.dev/ | grep -i x-robots   -> noindex
+#   curl -sI https://<custom-domain>/         | grep -i x-robots   -> nothing
+#
+# noindex only suppresses, it does not consolidate. To pass link equity to the real domain,
+# add a Cloudflare Redirect Rule in the dashboard 301-ing punehire.pages.dev/* to the
+# custom domain. A _headers file cannot redirect, and _redirects cannot match on host.
+#
+# https://:project.pages.dev/*
+# 	X-Robots-Tag: noindex
+
+# ── Everything, every host ────────────────────────────────────────────────────
+# No Content-Security-Policy on purpose: the inline theme script, the Leaflet map, and
+# GA/AdSense would all need enumerating, and a CSP that is wrong fails closed and breaks
+# the page. nosniff and Referrer-Policy carry no such risk.
+/*
+	X-Content-Type-Options: nosniff
+	Referrer-Policy: strict-origin-when-cross-origin
+
+# ── Build assets ──────────────────────────────────────────────────────────────
+# Astro fingerprints everything under /_astro/ with a content hash, so a changed file is a
+# changed URL. Safe to cache for a year and never revalidate.
+/_astro/*
+	Cache-Control: public, max-age=31536000, immutable

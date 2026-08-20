@@ -1,0 +1,130 @@
+---
+import ContentShell from '../../layouts/ContentShell.astro'
+import { allJobs, loadAll, stats } from '../../data/load'
+import { SITE_NAME } from '../../data/seo'
+import { url } from '../../data/slugs'
+import { GUIDES, articleLd, guideUrl, otherGuides } from '../../data/guides'
+
+const guide = GUIDES.find((g) => g.slug === 'how-to-read-a-startup-job-posting')!
+
+const jobs = await allJobs()
+const companies = await loadAll()
+const s = await stats()
+
+const remote = jobs.filter((j) => j.remote_type === 'remote').length
+const hybrid = jobs.filter((j) => j.remote_type === 'hybrid').length
+const atsNames = [...new Set(companies.filter((c) => c.ats).map((c) => c.ats))].sort()
+
+const description = guide.blurb
+---
+
+<ContentShell
+  title={`${guide.title} | ${SITE_NAME}`}
+  description={description}
+  path={guideUrl(guide.slug)}
+  h1={guide.h1}
+  lede={description}
+  crumbs={[{ name: 'Guides', href: '/guides/' }, { name: guide.nav, href: guideUrl(guide.slug) }]}
+  jsonLd={[articleLd(guide, Astro.site!, SITE_NAME)]}
+  narrow
+>
+  <p>
+    A startup job posting is usually written by the person you would report to, not by an HR
+    template, which makes it shorter and more honest than a services-company JD — and also less
+    standardised. The same words mean different things at different companies. Here is how to read
+    one without ruling yourself out of a role you could get, or walking into one you should not.
+  </p>
+
+  <h2>The title tells you less than the number suggests</h2>
+  <p>
+    Seniority labels are not consistent across companies. As a rough map: SDE-1, Associate or
+    Junior is first year or two; SDE-2 or Engineer II is a few years in; Senior or Lead means
+    owning a surface with little supervision; Staff or Principal is a senior individual
+    contributor, usually many years deep. But one company's "Senior" is another's "SDE-2", and a
+    twelve-person startup hands out titles differently from a three-hundred-person one. Treat the
+    title as a hint about scope, not a gate. If the responsibilities read like work you can do,
+    the number in the title is not the thing to stop on.
+  </p>
+
+  <h2>What the experience range here is derived from</h2>
+  <p>
+    Most Indian postings state seniority in words — "SDE-1", "3+ years", "strong fundamentals" —
+    rather than a structured field. The experience range shown on a job page here is read out of
+    the title and description by pattern matching; the employer did not fill in a number for us.
+    That means it is a filtering shortcut and it is wrong sometimes. The real claim is in the
+    posting itself, so read that before you decide you do not qualify. The method and its limits
+    are in <a href={url.about()}>how this works</a>.
+  </p>
+
+  <h2>"Hybrid" and "remote" mean something specific in Pune</h2>
+  <p>
+    On this site {hybrid} open {hybrid === 1 ? 'role names' : 'roles name'} hybrid work and{' '}
+    {remote} {remote === 1 ? 'names' : 'name'} remote, out of {s.jobs}. Hybrid at a Pune startup
+    usually means two to four days in the office, in whichever area the company sits — which is
+    why the <a href="/guides/where-pune-startup-jobs-are/">area a company is in</a> still decides
+    your commute even for a "hybrid" role. Remote is filtered strictly here: a role only counts as
+    remote if it names India and does not name another metro, because a bare "Remote" on a job
+    board is usually US-remote. If a posting says remote but the team is in one city, expect that
+    to mean hybrid in practice, and ask.
+  </p>
+
+  <h2>Must-haves versus the wish list</h2>
+  <p>
+    The requirements block is two lists wearing one heading. A few items are genuine must-haves —
+    the language the codebase is in, a specific framework the team lives in, sometimes a degree
+    for a visa or client reason. The rest is a wish list of everything that would be nice. Nobody
+    matches all of it. If you meet the must-haves and a fair share of the rest, you are a real
+    candidate; apply and let the team decide. Waiting until you match every line is how the role
+    closes without you in it.
+  </p>
+
+  <h2>Red flags worth walking away from</h2>
+  <ul>
+    <li>
+      <strong>Any request for money.</strong> A registration fee, a training deposit, payment for
+      equipment or a background check — no legitimate employer asks a candidate for these. It is
+      the clearest scam signal there is. More on this in <a href="/terms/">terms of use</a>.
+    </li>
+    <li>
+      <strong>A role with no shape.</strong> If after reading it you cannot say what you would do
+      in the first month, the company has not decided either, and you will absorb that confusion.
+    </li>
+    <li>
+      <strong>"Rockstar", "ninja", "work hard play hard", "like a family".</strong> Not
+      disqualifying on their own, but a posting leaning on them instead of describing the work is
+      often covering for long hours or a thin plan.
+    </li>
+    <li>
+      <strong>An unpaid "assignment" that is really free work.</strong> A short take-home is
+      normal. A multi-day build that looks a lot like a feature they need is not.
+    </li>
+    <li>
+      <strong>Pressure to decide immediately.</strong> A real offer survives you sleeping on it.
+    </li>
+  </ul>
+
+  <h2>What a startup posting leaves out</h2>
+  <p class="muted">
+    Almost always, salary. Indian startups rarely publish a band, which is why no page on this
+    site shows one — a number we invented would be worse than the silence. That is a question for
+    the first real conversation, and asking it early is normal, not pushy.
+  </p>
+
+  <h2>And where you actually apply</h2>
+  <p>
+    The apply button goes to the employer's own system —{' '}
+    {atsNames.length ? atsNames.join(', ') : 'their ATS'} — never to this site. What each of those
+    costs you in time, and which companies use which, is the next guide:{' '}
+    <a href="/guides/which-ats-a-company-uses/">which ATS a company uses</a>.
+  </p>
+
+  <h2 style="margin-top:2em">Other guides</h2>
+  <div class="grid">
+    {otherGuides(guide.slug).map((g) => (
+      <a class="tile" href={guideUrl(g.slug)}>
+        <h3>{g.nav}</h3>
+        <span class="meta">{g.blurb}</span>
+      </a>
+    ))}
+  </div>
+</ContentShell>
